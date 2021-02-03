@@ -29,6 +29,9 @@ func init() {
 	key = conf.Key
 }
 
+// GetBeatMaps return list of beatmap by specific beatmap set ID
+// or specific beatmap id. Should notice that if beatmap set and
+// beatmap id is both given, beatmap id is foremore.
 func GetBeatMaps(setID string, mapID string) ([]*Beatmap, error) {
 	// if beatmap_id is specific, request it first
 	if mapID != "" {
