@@ -74,6 +74,7 @@ func unmarshallBeatMaps(body []byte) ([]*Beatmap, error) {
 	return beatmaps, nil
 }
 
+// GetUsers return information about given users
 func GetUsers(username string) ([]*User, error) {
 	resp, err := request(buildURL("get_user", map[string]string{"k": key, "u": username}))
 	if err != nil {
