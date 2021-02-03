@@ -31,3 +31,25 @@ func TestGetBeatMaps(t *testing.T) {
 		}
 	})
 }
+
+func TestGetUsers(t *testing.T) {
+	test := func(want string) {
+		t.Run("get user", func(t *testing.T) {
+			users, err := GetUsers(want)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if users == nil {
+				t.Errorf("failed to fetch users")
+			}
+
+			for _, user := range users {
+				if user.Username != want {
+					t.Errorf("got %s want %s", user.Username, want)
+				}
+			}
+		})
+	}
+
+	test("avimitin")
+}
