@@ -67,11 +67,36 @@ func GetBeatMaps(setID string, mapID string) ([]*Beatmap, error) {
 
 func unmarshallBeatMaps(body []byte) ([]*Beatmap, error) {
 	var beatmaps []*Beatmap
-	err := json.Unmarshal(body, &beatmaps)
+	err := unmarshal(body, &beatmaps)
+	if err != nil {
+		return nil, err
+	}
+	return beatmaps, nil
+}
+
+func GetUsers(username string) ([]*User, error) {
+	resp, err := request(buildURL("get_user", map[string]string{"k": key, "u": username}))
+	if err != nil {
+		return nil, err
+	}
+	return unmarshallUsers(resp)
+}
+
+func unmarshallUsers(body []byte) ([]*User, error) {
+	var users []*User
+	err := unmarshal(body, &users)
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
+}
+
+func unmarshal(body []byte, object interface{}) error {
+	err := json.Unmarshal(body, object)
 	if err != nil {
 		// handle not RESTful response
 		if strings.Contains(err.Error(), "invalid character") {
-			return nil, fmt.Errorf("%s\n\nis not json format", body)
+			return fmt.Errorf("%s\n\nis not json format", body)
 		}
 		// handle error response
 		if strings.Contains(err.Error(), "cannot unmarshal object") {
@@ -79,13 +104,13 @@ func unmarshallBeatMaps(body []byte) ([]*Beatmap, error) {
 			err = json.Unmarshal(body, &respErr)
 			// handle other error (seldom appear, may remove someday)
 			if err != nil {
-				return nil, fmt.Errorf("unknown body: %s", body)
+				return fmt.Errorf("unknown body: %s", body)
 			}
-			return nil, fmt.Errorf(respErr.Error)
+			return fmt.Errorf(respErr.Error)
 		}
-		return nil, fmt.Errorf("unmarshal beatmaps: %v", err)
+		return fmt.Errorf("unmarshal beatmaps: %v", err)
 	}
-	return beatmaps, nil
+	return nil
 }
 
 func buildURL(method string, params map[string]string) string {
