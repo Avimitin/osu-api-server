@@ -116,3 +116,5 @@ type RecentPlay struct {
 type APIResponseError struct {
 	Error string `json:"error"`
 }
+
+type param map[string]string
