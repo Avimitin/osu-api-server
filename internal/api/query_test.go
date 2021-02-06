@@ -53,3 +53,18 @@ func TestGetUsers(t *testing.T) {
 
 	test("avimitin")
 }
+
+func TestGetUserBest(t *testing.T) {
+	userid := ""
+	mode := ""
+	limit := 10
+	maps, err := GetUserBest(userid, mode, limit)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, bmap := range maps {
+		if bmap.UserID != userid {
+			t.Errorf("want %s score got %s", userid, bmap.UserID)
+		}
+	}
+}
