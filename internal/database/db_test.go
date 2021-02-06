@@ -1,12 +1,20 @@
 package database
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/avimitin/osuapi/internal/config"
+)
 
 func TestConnect(t *testing.T) {
-	cfg := config.Configuration{
-		DBSec: {}
+	cfg, err := config.GetConfig()
+	if err != nil {
+		t.Fatal(err)
 	}
-	db, err := Connect(cfg)
+	if cfg.DBSec.Username == "" {
+		t.Fatal("no database config")
+	}
+	db, err := Connect(cfg.DBSec.EncodeDSN())
 	if err != nil {
 		t.Fatal(err)
 	}
