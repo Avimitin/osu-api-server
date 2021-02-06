@@ -18,7 +18,8 @@ func TestConnect(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = db.Ping()
+	defer db.DB.Close()
+	err = db.DB.Ping()
 	if err != nil {
 		t.Fatal(err)
 	}
