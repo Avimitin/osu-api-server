@@ -68,3 +68,19 @@ func TestGetUserBest(t *testing.T) {
 		}
 	}
 }
+
+func TestGetUserRecent(t *testing.T) {
+	username := ""
+	recentMaps, err := GetUserRecent(username, 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, recentMap := range recentMaps {
+		if recentMap == nil {
+			t.Fatalf("fetch nil map")
+		}
+		if recentMap.Score == "" {
+			t.Errorf("fetch no score")
+		}
+	}
+}

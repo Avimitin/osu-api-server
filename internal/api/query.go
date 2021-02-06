@@ -168,3 +168,24 @@ func GetUserBest(user string, mode string, limit int) ([]*UserBestScore, error) 
 	}
 	return bestScore, nil
 }
+
+func GetUserRecent(user string, limit int) ([]*RecentPlay, error) {
+	if limit <= 0 {
+		return nil, errors.New("invalid limit")
+	}
+	limitParam := strconv.Itoa(limit)
+	resp, err := request(
+		buildURL("get_user_recent",
+			param{"k": key, "u": user, "limit": limitParam},
+		),
+	)
+	if err != nil {
+		return nil, err
+	}
+	var recentPlay []*RecentPlay
+	err = unmarshal(resp, &recentPlay)
+	if err != nil {
+		return nil, err
+	}
+	return recentPlay, nil
+}
