@@ -8,7 +8,11 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func Connect(dsn string) (*sql.DB, error) {
+type OsuDB struct {
+	DB *sql.DB
+}
+
+func Connect(dsn string) (*OsuDB, error) {
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
 		return nil, fmt.Errorf("connect %s:%v", dsn, err)
@@ -19,5 +23,25 @@ func Connect(dsn string) (*sql.DB, error) {
 		db.SetMaxOpenConns(10)
 		db.SetMaxIdleConns(10)
 	}
-	return db, nil
+
+	return &OsuDB{DB: db}, nil
+}
+
+func (db *OsuDB) InitTable() error {
+	return nil
+}
+
+func initUserTable(db *sql.DB) error {
+	result, err := db.Exec(`
+CREATE TABLE IF NOT EXIST users(
+id INT AUTO_INCREMENT,
+user_id BIGINT ,
+username VARCHAR(255) ,
+playcount BIGINT ,
+pp_rank INT ,
+pp_raw INT ,
+acc DOUBLE ,
+)
+	`)
+	return nil
 }
