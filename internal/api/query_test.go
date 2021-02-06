@@ -55,7 +55,7 @@ func TestGetUsers(t *testing.T) {
 }
 
 func TestGetUserBest(t *testing.T) {
-	userid := ""
+	userid := "16900842"
 	mode := ""
 	limit := 10
 	maps, err := GetUserBest(userid, mode, limit)
