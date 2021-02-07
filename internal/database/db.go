@@ -84,7 +84,7 @@ func (db *OsuDB) InsertNewUser(
 
 func initUserTable(db *sql.DB) error {
 	const userTable = `
-CREATE TABLE IF NOT EXIST users(
+CREATE TABLE IF NOT EXISTS users(
 	id INT AUTO_INCREMENT,
 	user_id VARCHAR(18) NOT NULL,
 	username VARCHAR(255) NOT NULL,
