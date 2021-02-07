@@ -113,5 +113,21 @@ VALUES ('114514', 'avimitin', '100', '1', '999', '99', '1919810')
 	if user.AccYtd != "99" {
 		t.Errorf("get %+v is not wanter", user)
 	}
-	cleanUser(t, db)
+	defer cleanUser(t, db)
+}
+
+func TestInsertUser(t *testing.T) {
+	db := connect(t)
+	err := db.InsertNewUser("114514", "avimitin", "1", "1", "1", "99", "114514")
+	if err != nil {
+		t.Fatal(err)
+	}
+	user, err := db.GetUserRecent("avimitin")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if user.Acc != "99" {
+		t.Fatalf("get %+v is not want", user)
+	}
+	defer cleanUser(t, db)
 }
