@@ -75,7 +75,8 @@ WHERE username = ? OR user_id = ?
 		return nil, fmt.Errorf("query %s : %v", query, err)
 	}
 	defer stmtOut.Close()
-	var u *User
+
+	u := &User{}
 	err = stmtOut.QueryRow(username).Scan(
 		&u.Username, &u.PcYtd, &u.RankYtd, &u.PpYtd, &u.AccYtd, &u.TotalPlayYtd,
 	)
