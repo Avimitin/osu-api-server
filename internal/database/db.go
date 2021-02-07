@@ -111,7 +111,7 @@ INSERT INTO users (
 		return err
 	}
 	if af < 1 {
-		return errors.New("not row affected")
+		return errors.New("no row affected")
 	}
 	return nil
 }
