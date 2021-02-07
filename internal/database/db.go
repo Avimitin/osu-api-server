@@ -48,11 +48,12 @@ type User struct {
 }
 
 func (db *OsuDB) GetUserRecent(username string) (*User, error) {
-	const query = "SELECT username, playcount, rank, pp, acc FROM users WHERE username = ? OR user_id = ?"
+	const query = "SELECT username, playcount, rank, pp, acc, total_play FROM users WHERE username = ? OR user_id = ?"
 	var u *User
 	stmtOut, err := db.Conn.Prepare(query)
+	defer stmtOut.Close()
 	err = stmtOut.QueryRow(username).Scan(
-		&u.Username, &u.PlayCount, &u.PlayCount, &u.Rank, &u.PP, &u.Acc)
+		&u.Username, &u.PlayCount, &u.PlayCount, &u.Rank, &u.PP, &u.Acc, &u.TotalPlay)
 	if err != nil {
 		return nil, fmt.Errorf("query %s : %v", query, err)
 	}
