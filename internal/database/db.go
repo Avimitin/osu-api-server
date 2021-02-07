@@ -9,10 +9,12 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+//OsuDB contain sql.DB field
 type OsuDB struct {
 	Conn *sql.DB
 }
 
+// Connect return database connection by given DSN
 func Connect(dsn string) (*OsuDB, error) {
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
@@ -28,10 +30,12 @@ func Connect(dsn string) (*OsuDB, error) {
 	return &OsuDB{Conn: db}, nil
 }
 
+// InitTable initialize table at setup
 func (db *OsuDB) InitTable() error {
 	return initUserTable(db.Conn)
 }
 
+// User type contain user field
 type User struct {
 	UserID       string `json:"user_id"`
 	Username     string `json:"username"`
@@ -47,6 +51,7 @@ type User struct {
 	TotalPlayYtd string `json:"ttp_ytd"`
 }
 
+// GetUserRecent return user data with given name
 func (db *OsuDB) GetUserRecent(username string) (*User, error) {
 	const query = "SELECT username, playcount, rank, pp, acc, total_play FROM users WHERE username = ? OR user_id = ?"
 	u := &User{}
@@ -63,6 +68,7 @@ func (db *OsuDB) GetUserRecent(username string) (*User, error) {
 	return u, nil
 }
 
+// GetUserYtd return a user's yesterday data with given name
 func (db *OsuDB) GetUserYtd(username string) (*User, error) {
 	const query = `
 SELECT username, playcount_ytd, rank_ytd, pp_ytd, acc_ytd, total_play_ytd 
@@ -86,6 +92,7 @@ WHERE username = ? OR user_id = ?
 	return u, nil
 }
 
+// InsertNewUser insert user data into database
 func (db *OsuDB) InsertNewUser(
 	userID string, username string, pc string, rank string, pp string, acc string, total_play string,
 ) error {
@@ -116,6 +123,7 @@ INSERT INTO users (
 	return nil
 }
 
+// UpdateUser update user data with given data
 func (db *OsuDB) UpdateUser(
 	username string, pc string, rank string, pp string, acc string, total_play string,
 ) error {
