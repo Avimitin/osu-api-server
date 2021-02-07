@@ -54,7 +54,10 @@ func (db *OsuDB) GetUserRecent(username string) (*User, error) {
 	return u, nil
 }
 
-func (db *OsuDB) InsertNewUser(userID string, username string, pc string, rank string, pp string, acc string) (*User, error) {
+func (db *OsuDB) InsertNewUser(
+	userID string, username string, pc string, rank string, pp string, acc string,
+) (*User, error) {
+
 	const query = `INSERT INTO users (
 	user_id, username, playcount, rank, pp, acc
 ) VALUES (
