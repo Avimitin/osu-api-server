@@ -97,6 +97,7 @@ INSERT INTO users (
 )
 `
 	stmtIn, err := db.Conn.Prepare(query)
+	defer stmtIn.Close()
 	if err != nil {
 		return fmt.Errorf("query %s : %v", query, err)
 	}
