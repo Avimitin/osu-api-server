@@ -13,6 +13,7 @@ type DatabaseSecret struct {
 	Host     string `json:"host"`
 }
 
+// EncodeDSN return links to osu database
 func (dbs DatabaseSecret) EncodeDSN() string {
 	return fmt.Sprintf("%s:%s@tcp(%s)/osu?charset=utf8mb4", dbs.Username, dbs.Password, dbs.Host)
 }
