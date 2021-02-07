@@ -9,7 +9,7 @@ import (
 )
 
 type OsuDB struct {
-	DB *sql.DB
+	Conn *sql.DB
 }
 
 func Connect(dsn string) (*OsuDB, error) {
@@ -24,11 +24,11 @@ func Connect(dsn string) (*OsuDB, error) {
 		db.SetMaxIdleConns(10)
 	}
 
-	return &OsuDB{DB: db}, nil
+	return &OsuDB{Conn: db}, nil
 }
 
 func (db *OsuDB) InitTable() error {
-	return initUserTable(db.DB)
+	return initUserTable(db.Conn)
 }
 
 type User struct {
@@ -43,7 +43,7 @@ type User struct {
 func (db *OsuDB) GetUserRecent(username string) (*User, error) {
 	const query = "SELECT username, playcount, rank, pp, acc FROM users WHERE username = ? OR user_id = ?"
 	var u *User
-	stmtOut, err := db.DB.Prepare(query)
+	stmtOut, err := db.Conn.Prepare(query)
 	err = stmtOut.QueryRow(username).Scan(&u)
 	if err != nil {
 		return nil, fmt.Errorf("query %s : %v", query, err)
@@ -64,7 +64,7 @@ func (db *OsuDB) InsertNewUser(
 	?,?,?,?,?,?
 )
 `
-	stmtIn, err := db.DB.Prepare(query)
+	stmtIn, err := db.Conn.Prepare(query)
 	if err != nil {
 		return nil, fmt.Errorf("query %s : %v", query, err)
 	}

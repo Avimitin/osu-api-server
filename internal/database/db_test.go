@@ -18,7 +18,7 @@ func connect(t *testing.T) *OsuDB {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = db.DB.Ping()
+	err = db.Conn.Ping()
 	if err != nil {
 		t.Fatal(err)
 	}
