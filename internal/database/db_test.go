@@ -81,11 +81,37 @@ VALUES ('114514', 'avimitin', '100', '1', '999', '99', '1919810')
 	if user.Acc != "99" {
 		t.Errorf("get %+v is not wanted", user)
 	}
+	cleanUser(t, db)
+}
+
+func cleanUser(t *testing.T, db *OsuDB) {
 	t.Log("clean")
-	_, err = db.Conn.Exec(`
+	_, err := db.Conn.Exec(`
 DELETE FROM users WHERE user_id = '114514';
 	`)
 	if err != nil {
 		t.Errorf("Clean failed: %v", err)
 	}
+}
+
+func TestGetUserYtd(t *testing.T) {
+	db := connect(t)
+	_, err := db.Conn.Exec(`
+INSERT INTO users (user_id, username, playcount_ytd, rank_ytd, pp_ytd, acc_ytd, total_play_ytd)
+VALUES ('114514', 'avimitin', '100', '1', '999', '99', '1919810')
+`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	user, err := db.GetUserYtd("avimitin")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if user == nil {
+		t.Fatal("get nil user")
+	}
+	if user.AccYtd != "99" {
+		t.Errorf("get %+v is not wanter", user)
+	}
+	cleanUser(t, db)
 }
