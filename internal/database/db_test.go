@@ -64,3 +64,28 @@ func TestUserTable(t *testing.T) {
 		t.Errorf("%s not found, got %v", want, tables)
 	}
 }
+
+func TestGetUser(t *testing.T) {
+	db := connect(t)
+	_, err := db.Conn.Exec(`
+INSERT INTO users (user_id, username, playcount, rank, pp, acc, total_play)
+VALUES ('114514', 'avimitin', '100', '1', '999', '99', '1919810')
+`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	user, err := db.GetUserRecent("avimitin")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if user.Acc != "99" {
+		t.Errorf("get %+v is not wanted", user)
+	}
+	t.Log("clean")
+	_, err = db.Conn.Exec(`
+DELETE FROM users WHERE user_id = '114514';
+	`)
+	if err != nil {
+		t.Errorf("Clean failed: %v", err)
+	}
+}
