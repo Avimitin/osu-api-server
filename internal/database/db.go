@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"time"
 
@@ -56,7 +57,7 @@ func (db *OsuDB) GetUserRecent(username string) (*User, error) {
 
 func (db *OsuDB) InsertNewUser(
 	userID string, username string, pc string, rank string, pp string, acc string,
-) (*User, error) {
+) error {
 
 	const query = `
 INSERT INTO users (
@@ -67,20 +68,20 @@ INSERT INTO users (
 `
 	stmtIn, err := db.Conn.Prepare(query)
 	if err != nil {
-		return nil, fmt.Errorf("query %s : %v", query, err)
+		return fmt.Errorf("query %s : %v", query, err)
 	}
-	_, err = stmtIn.Exec(userID, username, pc, rank, pp, acc)
+	res, err := stmtIn.Exec(userID, username, pc, rank, pp, acc)
 	if err != nil {
-		return nil, fmt.Errorf("insert %s: %v", query, err)
+		return fmt.Errorf("insert %s: %v", query, err)
 	}
-	return &User{
-		UserID:    userID,
-		Username:  username,
-		PlayCount: pc,
-		Rank:      rank,
-		PP:        pp,
-		Acc:       acc,
-	}, nil
+	af, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if af < 1 {
+		return errors.New("not row affected")
+	}
+	return nil
 }
 
 func initUserTable(db *sql.DB) error {
