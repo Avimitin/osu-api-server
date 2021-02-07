@@ -131,3 +131,23 @@ func TestInsertUser(t *testing.T) {
 	}
 	defer cleanUser(t, db)
 }
+
+func TestUpdateUser(t *testing.T) {
+	db := connect(t)
+	err := db.InsertNewUser("114514", "avimitin", "1", "1", "1", "99", "114514")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = db.UpdateUser("avimitin", "1", "1", "1", "99", "1919810")
+	if err != nil {
+		t.Fatal(err)
+	}
+	user, err := db.GetUserRecent("avimitin")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if user.TotalPlay != "1919810" {
+		t.Fatalf("get %+v is not want", user)
+	}
+	defer cleanUser(t, db)
+}
