@@ -87,14 +87,14 @@ WHERE username = ? OR user_id = ?
 }
 
 func (db *OsuDB) InsertNewUser(
-	userID string, username string, pc string, rank string, pp string, acc string,
+	userID string, username string, pc string, rank string, pp string, acc string, total_play string,
 ) error {
 
 	const query = `
 INSERT INTO users (
-	user_id, username, playcount, rank, pp, acc
+	user_id, username, playcount, rank, pp, acc, total_play
 ) VALUES (
-	?,?,?,?,?,?
+	?,?,?,?,?,?,?
 )
 `
 	stmtIn, err := db.Conn.Prepare(query)
@@ -102,7 +102,7 @@ INSERT INTO users (
 	if err != nil {
 		return fmt.Errorf("query %s : %v", query, err)
 	}
-	res, err := stmtIn.Exec(userID, username, pc, rank, pp, acc)
+	res, err := stmtIn.Exec(userID, username, pc, rank, pp, acc, total_play)
 	if err != nil {
 		return fmt.Errorf("insert %s: %v", query, err)
 	}
