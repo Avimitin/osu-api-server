@@ -33,12 +33,18 @@ func (db *OsuDB) InitTable() error {
 }
 
 type User struct {
-	UserID    string `json:"user_id"`
-	Username  string `json:"username"`
-	PlayCount string `json:"play_count"`
-	Rank      string `json:"rank"`
-	PP        string `json:"pp"`
-	Acc       string `json:"acc"`
+	UserID       string `json:"user_id"`
+	Username     string `json:"username"`
+	PlayCount    string `json:"play_count"`
+	Rank         string `json:"rank"`
+	PP           string `json:"pp"`
+	Acc          string `json:"acc"`
+	TotalPlay    string `json:"total_play"`
+	PcYtd        string `json:"play_count_ytd"`
+	RankYtd      string `json:"rank_ytd"`
+	PpYtd        string `json:"pp_ytd"`
+	AccYtd       string `json:"acc_ytd"`
+	TotalPlayYtd string `json:"ttp_ytd"`
 }
 
 func (db *OsuDB) GetUserRecent(username string) (*User, error) {
