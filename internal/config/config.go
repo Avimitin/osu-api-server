@@ -8,6 +8,10 @@ import (
 	"os"
 )
 
+// GetConfig search config at
+// $HOME/.config/osuapi/config.json
+// or $osu_conf_path/config.json.
+// return error if no env set
 func GetConfig() (*Configuration, error) {
 	if path := os.Getenv("osu_conf_path"); path != "" {
 		return getConfigFromPath(path + "/config.json")
