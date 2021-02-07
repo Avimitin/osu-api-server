@@ -63,6 +63,28 @@ func (db *OsuDB) GetUserRecent(username string) (*User, error) {
 	return u, nil
 }
 
+func (db *OsuDB) GetUserYtd(username string) (*User, error) {
+	const query = `
+SELECT username, playcount_ytd, rank_ytd, pp_ytd, acc_ytd, total_play_ytd 
+FROM users 
+WHERE username = ? OR user_id = ?
+`
+
+	stmtOut, err := db.Conn.Prepare(query)
+	if err != nil {
+		return nil, fmt.Errorf("query %s : %v", query, err)
+	}
+	defer stmtOut.Close()
+	var u *User
+	err = stmtOut.QueryRow(username).Scan(
+		&u.Username, &u.PcYtd, &u.RankYtd, &u.PpYtd, &u.AccYtd, &u.TotalPlayYtd,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("scan %s : %v", query, err)
+	}
+	return u, nil
+}
+
 func (db *OsuDB) InsertNewUser(
 	userID string, username string, pc string, rank string, pp string, acc string,
 ) error {
