@@ -28,20 +28,31 @@ func Connect(dsn string) (*OsuDB, error) {
 }
 
 func (db *OsuDB) InitTable() error {
-	return nil
+	return initUserTable(db.DB)
 }
 
 func initUserTable(db *sql.DB) error {
-	result, err := db.Exec(`
+	const userTable = `
 CREATE TABLE IF NOT EXIST users(
 id INT AUTO_INCREMENT,
-user_id BIGINT ,
-username VARCHAR(255) ,
-playcount BIGINT ,
-pp_rank INT ,
-pp_raw INT ,
-acc DOUBLE ,
-)
-	`)
+user_id BIGINT,
+username VARCHAR(255),
+playcount BIGINT,
+rank INT,
+pp INT,
+acc DOUBLE,
+playcount_ytd BIGINT,
+rank_ytd INT,
+pp_ytd INT,
+acc_ytd DOUBLE,
+total_play_ytd BIGINT,
+PRIMARY KEY (id)
+)CHARSET=utf8mb4
+	`
+	_, err := db.Exec(userTable)
+	if err != nil {
+		return fmt.Errorf("init table: %s:%v", userTable, err)
+	}
+
 	return nil
 }
