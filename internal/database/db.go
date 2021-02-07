@@ -58,7 +58,8 @@ func (db *OsuDB) InsertNewUser(
 	userID string, username string, pc string, rank string, pp string, acc string,
 ) (*User, error) {
 
-	const query = `INSERT INTO users (
+	const query = `
+INSERT INTO users (
 	user_id, username, playcount, rank, pp, acc
 ) VALUES (
 	?,?,?,?,?,?
