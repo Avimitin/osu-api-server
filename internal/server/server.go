@@ -18,13 +18,3 @@ func (osuSer *OsuServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	players := strings.TrimPrefix(r.URL.Path, "/api/v1/players/")
 	fmt.Fprint(w, osuSer.Data.GetPlayerStat(players))
 }
-
-func GetUserStat(username string) string {
-	if username == "avimitin" {
-		return `{"username": "avimitin"}`
-	}
-	if username == "coooool" {
-		return `{"username": "coooool"}`
-	}
-	return ""
-}
