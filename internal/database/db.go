@@ -2,7 +2,6 @@ package database
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 	"time"
 
@@ -96,7 +95,6 @@ WHERE username = ? OR user_id = ?
 func (db *OsuDB) InsertNewUser(
 	userID string, username string, pc string, rank string, pp string, acc string, total_play string,
 ) error {
-
 	const query = `
 INSERT INTO users (
 	user_id, username, playcount, rank, pp, acc, total_play
@@ -104,21 +102,9 @@ INSERT INTO users (
 	?,?,?,?,?,?,?
 )
 `
-	stmtIn, err := db.Conn.Prepare(query)
-	defer stmtIn.Close()
-	if err != nil {
-		return fmt.Errorf("query %s : %v", query, err)
-	}
-	res, err := stmtIn.Exec(userID, username, pc, rank, pp, acc, total_play)
-	if err != nil {
-		return fmt.Errorf("insert %s: %v", query, err)
-	}
-	af, err := res.RowsAffected()
+	err := db.modify(query, userID, username, pc, rank, pp, acc, total_play)
 	if err != nil {
 		return err
-	}
-	if af < 1 {
-		return errors.New("no row affected")
 	}
 	return nil
 }
@@ -132,17 +118,9 @@ UPDATE users
 SET playcount=?, rank=?, pp=?, acc=?, total_play=?
 WHERE username=?
 `
-	stmtUp, err := db.Conn.Prepare(query)
+	err := db.modify(query, pc, rank, pp, acc, total_play, username)
 	if err != nil {
-		return fmt.Errorf("query %s: %v", query, err)
-	}
-	res, err := stmtUp.Exec(pc, rank, pp, acc, total_play, username)
-	if err != nil {
-		return fmt.Errorf("update %s: %v", query, err)
-	}
-	rows, err := res.RowsAffected()
-	if rows < 1 {
-		return errors.New("no row affected")
+		return err
 	}
 	return nil
 }
