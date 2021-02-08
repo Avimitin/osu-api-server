@@ -9,9 +9,9 @@ import (
 
 func main() {
 	// cast
-	handler := http.HandlerFunc(server.OsuServer)
+	OsuSer := &server.OsuServer{}
 
-	if err := http.ListenAndServe(":11451", handler); err != nil {
+	if err := http.ListenAndServe(":11451", OsuSer); err != nil {
 		log.Fatalf("handle %s : %v", ":11451", err)
 	}
 }
