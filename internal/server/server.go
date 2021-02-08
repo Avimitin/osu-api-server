@@ -6,9 +6,17 @@ import (
 	"strings"
 )
 
-func OsuServer(w http.ResponseWriter, r *http.Request) {
+type PlayerData interface {
+	GetPlayerStat(name string) string
+}
+
+type OsuServer struct {
+	Data PlayerData
+}
+
+func (osuSer *OsuServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	players := strings.TrimPrefix(r.URL.Path, "/api/v1/players/")
-	fmt.Fprint(w, GetUserStat(players))
+	fmt.Fprint(w, osuSer.Data.GetPlayerStat(players))
 }
 
 func GetUserStat(username string) string {
