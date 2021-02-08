@@ -7,6 +7,15 @@ import (
 	"testing"
 )
 
+type playerDataTest struct {
+	stat map[string]string
+}
+
+func (pdt *playerDataTest) GetPlayerStat(name string) string {
+	username := pdt.stat[name]
+	return fmt.Sprintf(`{"username": "%s"}`, username)
+}
+
 func TestGetPlayer(t *testing.T) {
 	t.Run("Get avimitin score", func(t *testing.T) {
 		got := makeGetUserStatRequest("avimitin")
@@ -26,7 +35,16 @@ func TestGetPlayer(t *testing.T) {
 func makeGetUserStatRequest(username string) string {
 	request, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("/api/v1/players/%s", username), nil)
 	response := httptest.NewRecorder()
-	OsuServer(response, request)
+	pdt := &playerDataTest{
+		map[string]string{
+			"coooool":  "coooool",
+			"avimitin": "avimitin",
+		},
+	}
+	ser := &OsuServer{
+		Data: pdt,
+	}
+	ser.ServeHTTP(response, request)
 	return response.Body.String()
 }
 
