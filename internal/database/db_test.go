@@ -151,3 +151,23 @@ func TestUpdateUser(t *testing.T) {
 	}
 	defer cleanUser(t, db)
 }
+
+func TestUpdateUserYtd(t *testing.T) {
+	db := connect(t)
+	err := db.InsertNewUser("114514", "avimitin", "1", "1", "1", "99", "114514")
+	defer cleanUser(t, db)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = db.UpdateUserYtd("avimitin", "1", "1", "1", "99", "1919810")
+	if err != nil {
+		t.Fatal(err)
+	}
+	user, err := db.GetUserYtd("avimitin")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if user.TotalPlayYtd != "1919810" {
+		t.Fatalf("get %+v is not want", user)
+	}
+}

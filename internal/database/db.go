@@ -125,6 +125,21 @@ WHERE username=?
 	return nil
 }
 
+func (db *OsuDB) UpdateUserYtd(
+	username string, pc string, rank string, pp string, acc string, total_play string,
+) error {
+	const query = `
+UPDATE users
+SET playcount_ytd=?, rank_ytd=?, pp_ytd=?, acc_ytd=?, total_play_ytd=?
+WHERE username=?
+`
+	err := db.modify(query, pc, rank, pp, acc, total_play, username)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func initUserTable(db *sql.DB) error {
 	const userTable = `
 CREATE TABLE IF NOT EXISTS users(
