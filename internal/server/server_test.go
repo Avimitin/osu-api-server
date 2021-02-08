@@ -12,40 +12,70 @@ type playerDataTest struct {
 }
 
 func (pdt *playerDataTest) GetPlayerStat(name string) string {
-	username := pdt.stat[name]
+	username, ok := pdt.stat[name]
+	if !ok {
+		return ""
+	}
 	return fmt.Sprintf(`{"username": "%s"}`, username)
 }
 
 func TestGetPlayer(t *testing.T) {
 	t.Run("Get avimitin score", func(t *testing.T) {
-		got := makeGetUserStatRequest("avimitin")
+		response := httptest.NewRecorder()
+		got := makeGetUserStatRequest("avimitin", response)
 		want := `{"username": "avimitin"}`
 
 		assertGetUser(t, got, want)
+		assertStatus(t, response.Code, http.StatusOK)
 	})
 
 	t.Run("Get coooool score", func(t *testing.T) {
-		got := makeGetUserStatRequest("coooool")
+		response := httptest.NewRecorder()
+		got := makeGetUserStatRequest("coooool", response)
 		want := `{"username": "coooool"}`
 
 		assertGetUser(t, got, want)
+		assertStatus(t, response.Code, http.StatusOK)
+	})
+
+	t.Run("Get 404", func(t *testing.T) {
+		req := makeUserRequest("jixun")
+		response := httptest.NewRecorder()
+		ser := newSer()
+		ser.ServeHTTP(response, req)
+		assertStatus(t, response.Code, http.StatusNotFound)
 	})
 }
 
-func makeGetUserStatRequest(username string) string {
-	request, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("/api/v1/players/%s", username), nil)
-	response := httptest.NewRecorder()
+func assertStatus(t testing.TB, got, want int) {
+	t.Helper()
+	if got != want {
+		t.Errorf("got %d want %d", got, want)
+	}
+}
+
+func makeUserRequest(username string) (request *http.Request) {
+	request, _ = http.NewRequest(http.MethodGet, fmt.Sprintf("/api/v1/players/%s", username), nil)
+	return request
+}
+
+func makeGetUserStatRequest(username string, response *httptest.ResponseRecorder) string {
+	request := makeUserRequest(username)
+	ser := newSer()
+	ser.ServeHTTP(response, request)
+	return response.Body.String()
+}
+
+func newSer() *OsuServer {
 	pdt := &playerDataTest{
 		map[string]string{
 			"coooool":  "coooool",
 			"avimitin": "avimitin",
 		},
 	}
-	ser := &OsuServer{
+	return &OsuServer{
 		Data: pdt,
 	}
-	ser.ServeHTTP(response, request)
-	return response.Body.String()
 }
 
 func assertGetUser(t testing.TB, got, want string) {

@@ -15,6 +15,10 @@ type OsuServer struct {
 }
 
 func (osuSer *OsuServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	players := strings.TrimPrefix(r.URL.Path, "/api/v1/players/")
-	fmt.Fprint(w, osuSer.Data.GetPlayerStat(players))
+	player := strings.TrimPrefix(r.URL.Path, "/api/v1/players/")
+	stat := osuSer.Data.GetPlayerStat(player)
+	if stat == "" {
+		w.WriteHeader(http.StatusNotFound)
+	}
+	fmt.Fprint(w, stat)
 }
