@@ -8,6 +8,6 @@ Target:
 
 - ~~get latest user data~~
 - ~~diff local data and latest data~~
-- return different and latest data
-- update local data
+- ~~return different and latest data~~
+- ~~update local data~~
 
