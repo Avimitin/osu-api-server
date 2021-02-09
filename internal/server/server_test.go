@@ -1,6 +1,8 @@
 package server
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -14,7 +16,7 @@ type playerDataTest struct {
 func (pdt *playerDataTest) GetPlayerStat(name string) (string, error) {
 	username, ok := pdt.stat[name]
 	if !ok {
-		return "", nil
+		return "", errors.New("user not found")
 	}
 	return fmt.Sprintf(`{"username": "%s"}`, username), nil
 }
@@ -44,6 +46,26 @@ func TestGetPlayer(t *testing.T) {
 		ser := newSer()
 		ser.ServeHTTP(response, req)
 		assertStatus(t, response.Code, http.StatusNotFound)
+	})
+
+	t.Run("Get latest data", func(t *testing.T) {
+		req := makeUserRequest("avimitin")
+		response := httptest.NewRecorder()
+		ser := &OsuServer{
+			Data: &OsuPlayerData{},
+		}
+		ser.ServeHTTP(response, req)
+		assertStatus(t, response.Code, http.StatusOK)
+		p := &Player{}
+		err := json.Unmarshal(response.Body.Bytes(), &p.Data)
+		if err != nil {
+			t.Errorf("unmarshal %s:%v", response.Body.Bytes(), err)
+		}
+		want := "avimitin"
+		get := p.Data.Username
+		if want != get {
+			t.Errorf("Want %s got %s", want, get)
+		}
 	})
 }
 
