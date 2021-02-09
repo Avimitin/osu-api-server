@@ -7,7 +7,7 @@ import (
 )
 
 type PlayerData interface {
-	GetPlayerStat(name string) string
+	GetPlayerStat(name string) (string, error)
 }
 
 type OsuServer struct {
@@ -16,7 +16,7 @@ type OsuServer struct {
 
 func (osuSer *OsuServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	player := strings.TrimPrefix(r.URL.Path, "/api/v1/players/")
-	stat := osuSer.Data.GetPlayerStat(player)
+	stat, _ := osuSer.Data.GetPlayerStat(player)
 	if stat == "" {
 		w.WriteHeader(http.StatusNotFound)
 	}
