@@ -58,6 +58,9 @@ func (opd *OsuPlayerData) GetPlayerStat(name string) (string, error) {
 	}
 	p := &Player{
 		Data: u[0],
+		Diff: &Different{
+			Acc: "1",
+		},
 	}
 	data, e := json.Marshal(p)
 	if e != nil {

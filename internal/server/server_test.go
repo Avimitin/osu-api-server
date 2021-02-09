@@ -67,6 +67,25 @@ func TestGetPlayer(t *testing.T) {
 			t.Errorf("Want %s got %s", want, get)
 		}
 	})
+
+	t.Run("get diff", func(t *testing.T) {
+		req := makeUserRequest("avimitin")
+		resp := httptest.NewRecorder()
+		ser := &OsuServer{
+			Data: &OsuPlayerData{},
+		}
+		ser.ServeHTTP(resp, req)
+
+		p := Player{}
+		err := json.Unmarshal(resp.Body.Bytes(), &p)
+		if err != nil {
+			t.Fatalf("unmarshal %s : %v", resp.Body.Bytes(), err)
+		}
+
+		if p.Diff == nil || p.Diff.Acc == "" {
+			t.Errorf("unexpected: %+v", p)
+		}
+	})
 }
 
 func assertStatus(t testing.TB, got, want int) {
