@@ -4,13 +4,30 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
 
 	"github.com/avimitin/osuapi/internal/api"
+	"github.com/avimitin/osuapi/internal/config"
 	"github.com/avimitin/osuapi/internal/database"
 )
+
+var (
+	db *database.OsuDB
+)
+
+func init() {
+	cfg, err := config.GetConfig()
+	if err != nil {
+		log.Fatal(err)
+	}
+	db, err = database.Connect(cfg.DBSec.EncodeDSN())
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
 type PlayerData interface {
 	GetPlayerStat(name string) (string, error)
