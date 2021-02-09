@@ -115,6 +115,7 @@ func getPlayerDataByName(name string) (*Player, error) {
 			if e != nil {
 				return nil, fmt.Errorf("insert user %s : %v", name, e)
 			}
+			log.Printf("inserted %s into database", user.Username)
 		} else {
 			return nil, fmt.Errorf("query user %s: %v", name, e)
 		}
