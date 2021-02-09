@@ -27,6 +27,11 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	if !db.TableExist() {
+		if e := db.InitTable(); e != nil {
+			log.Fatal(e)
+		}
+	}
 }
 
 type PlayerData interface {
@@ -48,10 +53,7 @@ func (osuSer *OsuServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, stat)
 }
 
-type OsuPlayerData struct {
-	LatestData *api.User
-	LocalData  *database.User
-}
+type OsuPlayerData struct{}
 
 type Player struct {
 	Data *api.User  `json:"latest_data"`
@@ -86,11 +88,32 @@ func getPlayerDataByName(name string) (*Player, error) {
 	if len(u) <= 0 {
 		return nil, errors.New("user %s not found")
 	}
+	user := u[0]
+	lu, e := db.GetUserRecent(user.Username)
+	if e != nil {
+		if strings.Contains(e.Error(), "user") {
+			e = db.InsertNewUser(
+				user.UserID, user.Username, user.Playcount, user.PpRank,
+				user.PpRaw, user.Accuracy, user.TotalSecondsPlayed,
+			)
+			if e != nil {
+				return nil, fmt.Errorf("insert user %s : %v", name, e)
+			}
+		} else {
+			return nil, fmt.Errorf("query user %s: %v", name, e)
+		}
+	}
+	var diff *Different
+	if lu != nil {
+		diff, e = getUserDiff(user, lu)
+	}
+	if e != nil {
+		return nil, e
+	}
+
 	p := &Player{
 		Data: u[0],
-		Diff: &Different{
-			Acc: "1",
-		},
+		Diff: diff,
 	}
 	return p, nil
 }
