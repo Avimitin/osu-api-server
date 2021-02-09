@@ -102,7 +102,7 @@ func getPlayerDataByName(name string) (*Player, error) {
 		return nil, e
 	}
 	if len(u) <= 0 {
-		return nil, errors.New("user %s not found")
+		return nil, errors.New("user " + name + " not found")
 	}
 	user := u[0]
 	lu, e := db.GetUserRecent(user.Username)
