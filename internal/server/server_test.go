@@ -89,6 +89,28 @@ func TestGetPlayer(t *testing.T) {
 			t.Errorf("unexpected: %+v", p)
 		}
 	})
+
+	t.Run("monk actual curl", func(t *testing.T) {
+		req := makeUserRequest("avimitin")
+		resp := httptest.NewRecorder()
+		ser := &OsuServer{
+			Data: &OsuPlayerData{},
+		}
+		ser.ServeHTTP(resp, req)
+		assertStatus(t, resp.Code, http.StatusOK)
+		p := Player{}
+		err := json.Unmarshal(resp.Body.Bytes(), &p)
+		if err != nil {
+			t.Fatalf("unmarshal %s : %v", resp.Body.Bytes(), err)
+		}
+		if p.Data == nil || p.Data.Accuracy == "" {
+			t.Errorf("unexpected: %+v", p)
+		}
+
+		if p.Diff == nil || p.Diff.Acc == "" {
+			t.Errorf("unexpected: %+v", p)
+		}
+	})
 }
 
 func TestGetDiff(t *testing.T) {
