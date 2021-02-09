@@ -4,6 +4,11 @@ pipeline {
 			image 'golang:1.15-buster'
 		}
 	}
+
+	environment{
+		XDG_CACHE_HOME='/tmp/.cache'
+	}
+
 	stages{
 		stage('Setup') {
 			steps {
