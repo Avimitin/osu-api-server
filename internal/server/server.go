@@ -56,7 +56,10 @@ func (opd *OsuPlayerData) GetPlayerStat(name string) (string, error) {
 	if len(u) <= 0 {
 		return "", errors.New("user %s not found")
 	}
-	data, e := json.Marshal(u[0])
+	p := &Player{
+		Data: u[0],
+	}
+	data, e := json.Marshal(p)
 	if e != nil {
 		return "", e
 	}

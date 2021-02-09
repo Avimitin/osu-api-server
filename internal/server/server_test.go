@@ -57,7 +57,7 @@ func TestGetPlayer(t *testing.T) {
 		ser.ServeHTTP(response, req)
 		assertStatus(t, response.Code, http.StatusOK)
 		p := &Player{}
-		err := json.Unmarshal(response.Body.Bytes(), &p.Data)
+		err := json.Unmarshal(response.Body.Bytes(), &p)
 		if err != nil {
 			t.Errorf("unmarshal %s:%v", response.Body.Bytes(), err)
 		}
