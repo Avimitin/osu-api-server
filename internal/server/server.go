@@ -49,12 +49,24 @@ type Different struct {
 }
 
 func (opd *OsuPlayerData) GetPlayerStat(name string) (string, error) {
-	u, e := api.GetUsers(name)
+	p, e := getPlayerDataByName(name)
 	if e != nil {
 		return "", e
 	}
+	data, e := json.Marshal(p)
+	if e != nil {
+		return "", e
+	}
+	return string(data), nil
+}
+
+func getPlayerDataByName(name string) (*Player, error) {
+	u, e := api.GetUsers(name)
+	if e != nil {
+		return nil, e
+	}
 	if len(u) <= 0 {
-		return "", errors.New("user %s not found")
+		return nil, errors.New("user %s not found")
 	}
 	p := &Player{
 		Data: u[0],
@@ -62,9 +74,5 @@ func (opd *OsuPlayerData) GetPlayerStat(name string) (string, error) {
 			Acc: "1",
 		},
 	}
-	data, e := json.Marshal(p)
-	if e != nil {
-		return "", e
-	}
-	return string(data), nil
+	return p, nil
 }
