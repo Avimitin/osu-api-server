@@ -23,14 +23,18 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	log.Println("config initialized")
 	db, err = database.Connect(cfg.DBSec.EncodeDSN())
 	if err != nil {
 		log.Fatal(err)
 	}
+	log.Println("database connected")
 	if !db.TableExist() {
+		log.Println("table not found")
 		if e := db.InitTable(); e != nil {
 			log.Fatal(e)
 		}
+		log.Println("table `users` built")
 	}
 }
 
@@ -43,9 +47,16 @@ type OsuServer struct {
 }
 
 func (osuSer *OsuServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	log.Printf("%s sent %s request to %s", r.RemoteAddr, r.Method, r.URL.Host+r.URL.Path)
+	if r.Method != http.MethodGet {
+		fmt.Fprint(w, `{"error":"invalid method"}`)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 	player := strings.TrimPrefix(r.URL.Path, "/api/v1/players/")
 	stat, err := osuSer.Data.GetPlayerStat(player)
 	if err != nil {
+		log.Printf("get %s data: %v", player, err)
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Fprintf(w, `{"error": "%s"}`, err.Error())
 		return
