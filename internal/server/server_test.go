@@ -51,45 +51,6 @@ func TestGetPlayer(t *testing.T) {
 		assertStatus(t, response.Code, http.StatusNotFound)
 	})
 
-	t.Run("Get latest data", func(t *testing.T) {
-		req := makeUserRequest("avimitin")
-		response := httptest.NewRecorder()
-		ser := &OsuServer{
-			Data: &OsuPlayerData{},
-		}
-		ser.ServeHTTP(response, req)
-		assertStatus(t, response.Code, http.StatusOK)
-		p := &Player{}
-		err := json.Unmarshal(response.Body.Bytes(), &p)
-		if err != nil {
-			t.Errorf("unmarshal %s:%v", response.Body.Bytes(), err)
-		}
-		want := "avimitin"
-		get := p.Data.Username
-		if want != get {
-			t.Errorf("Want %s got %s", want, get)
-		}
-	})
-
-	t.Run("get diff", func(t *testing.T) {
-		req := makeUserRequest("avimitin")
-		resp := httptest.NewRecorder()
-		ser := &OsuServer{
-			Data: &OsuPlayerData{},
-		}
-		ser.ServeHTTP(resp, req)
-
-		p := Player{}
-		err := json.Unmarshal(resp.Body.Bytes(), &p)
-		if err != nil {
-			t.Fatalf("unmarshal %s : %v", resp.Body.Bytes(), err)
-		}
-
-		if p.Diff == nil || p.Diff.Acc == "" {
-			t.Errorf("unexpected: %+v", p)
-		}
-	})
-
 	t.Run("monk actual curl", func(t *testing.T) {
 		req := makeUserRequest("avimitin")
 		resp := httptest.NewRecorder()
