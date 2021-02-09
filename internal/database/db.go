@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -32,6 +33,35 @@ func Connect(dsn string) (*OsuDB, error) {
 // InitTable initialize table at setup
 func (db *OsuDB) InitTable() error {
 	return initUserTable(db.Conn)
+}
+
+func (db *OsuDB) TableExist() bool {
+	rows, err := db.Conn.Query("SHOW TABLES;")
+	if err != nil {
+		log.Fatal(err)
+	}
+	var tables []string
+	for rows.Next() {
+		var table string
+		rowErr := rows.Scan(&table)
+		if rowErr != nil {
+			log.Fatal(err)
+		}
+		tables = append(tables, table)
+	}
+
+	var want = "users"
+	exist := false
+	if len(tables) == 0 {
+		return false
+	} else {
+		for _, t := range tables {
+			if t == want {
+				exist = true
+			}
+		}
+	}
+	return exist
 }
 
 // User type contain user field
