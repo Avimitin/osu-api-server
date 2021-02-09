@@ -53,8 +53,8 @@ func (osuSer *OsuServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	if r.URL.Path != "/api/v1/players" {
-		fmt.Fprint(w, `{"error":"page not found"}`)
+	if !strings.HasPrefix(r.URL.Path, "/api/v1/players") {
+		fmt.Fprintf(w, `{"error":"page %s not found"}`, r.URL.Path)
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
