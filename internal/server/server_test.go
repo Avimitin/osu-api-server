@@ -11,12 +11,12 @@ type playerDataTest struct {
 	stat map[string]string
 }
 
-func (pdt *playerDataTest) GetPlayerStat(name string) string {
+func (pdt *playerDataTest) GetPlayerStat(name string) (string, error) {
 	username, ok := pdt.stat[name]
 	if !ok {
-		return ""
+		return "", nil
 	}
-	return fmt.Sprintf(`{"username": "%s"}`, username)
+	return fmt.Sprintf(`{"username": "%s"}`, username), nil
 }
 
 func TestGetPlayer(t *testing.T) {
