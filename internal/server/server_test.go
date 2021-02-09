@@ -7,6 +7,9 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/avimitin/osuapi/internal/api"
+	"github.com/avimitin/osuapi/internal/database"
 )
 
 type playerDataTest struct {
@@ -86,6 +89,58 @@ func TestGetPlayer(t *testing.T) {
 			t.Errorf("unexpected: %+v", p)
 		}
 	})
+}
+
+func TestGetDiff(t *testing.T) {
+	t.Run("get positive diff", func(t *testing.T) {
+		diff, err := getUserDiff(
+			&api.User{
+				PpRaw:              "3426.48",
+				Accuracy:           "97.31963348388672",
+				Playcount:          "14085",
+				TotalSecondsPlayed: "1041175",
+				PpRank:             "111254",
+			},
+			&database.User{
+				PP:        "4000.50",
+				Acc:       "97.89052605628967",
+				TotalPlay: "2478401",
+				PlayCount: "25000",
+				Rank:      "57",
+			},
+		)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if diff.Rank != "-111197" {
+			t.Errorf("get %+v", diff)
+		}
+	})
+}
+
+func TestCastFloat64(t *testing.T) {
+	i, err := parseFloat("3426.48")
+	if err != nil {
+		t.Fatalf("cast 3426.48 got %v", err)
+	}
+	j, err := parseFloat("4000.50")
+	if err != nil {
+		t.Fatalf("cast 4000.5 got %v", err)
+	}
+	if i != 3426.48 {
+		t.Errorf("want 3426.48 got %f", i)
+	}
+	if j != 4000.50 {
+		t.Errorf("want 4000.5 got %f", j)
+	}
+
+	if i-j != -574.02 {
+		t.Errorf("expect %f got %f", -574.02, i-j)
+	}
+
+	if fmt.Sprintf("%.3f", i-j) != "-574.020" {
+		t.Errorf("expect %s got %s", "-574.020", fmt.Sprintf("%.3f", i-j))
+	}
 }
 
 func assertStatus(t testing.TB, got, want int) {
