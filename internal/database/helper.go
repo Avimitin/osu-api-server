@@ -8,7 +8,7 @@ import (
 var NoRowAff = errors.New("no row affected")
 
 func (db *OsuDB) modify(query string, value ...interface{}) error {
-	stmtIn, err := db.Conn.Prepare(query)
+	stmtIn, err := db.Ctrl.Prepare(query)
 	if err != nil {
 		return fmt.Errorf("query %s : %v", query, err)
 	}

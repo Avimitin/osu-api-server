@@ -11,7 +11,7 @@ import (
 
 //OsuDB contain sql.DB field
 type OsuDB struct {
-	Conn *sql.DB
+	Ctrl *sql.DB
 }
 
 // Connect return database connection by given DSN
@@ -27,16 +27,16 @@ func Connect(dsn string) (*OsuDB, error) {
 		db.SetMaxIdleConns(10)
 	}
 
-	return &OsuDB{Conn: db}, nil
+	return &OsuDB{Ctrl: db}, nil
 }
 
 // InitTable initialize table at setup
 func (db *OsuDB) InitTable() error {
-	return initUserTable(db.Conn)
+	return initUserTable(db.Ctrl)
 }
 
 func (db *OsuDB) TableExist() bool {
-	rows, err := db.Conn.Query("SHOW TABLES;")
+	rows, err := db.Ctrl.Query("SHOW TABLES;")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -84,7 +84,7 @@ type User struct {
 func (db *OsuDB) GetUserRecent(username string) (*User, error) {
 	const query = "SELECT username, playcount, rank, pp, acc, total_play FROM users WHERE username = ? OR user_id = ?"
 	u := &User{}
-	stmtOut, err := db.Conn.Prepare(query)
+	stmtOut, err := db.Ctrl.Prepare(query)
 	defer stmtOut.Close()
 	err = stmtOut.QueryRow(username, username).Scan(
 		&u.Username, &u.PlayCount, &u.Rank, &u.PP, &u.Acc, &u.TotalPlay)
@@ -105,7 +105,7 @@ FROM users
 WHERE username = ? OR user_id = ?
 `
 
-	stmtOut, err := db.Conn.Prepare(query)
+	stmtOut, err := db.Ctrl.Prepare(query)
 	if err != nil {
 		return nil, fmt.Errorf("query %s : %v", query, err)
 	}

@@ -18,7 +18,7 @@ func connect(t *testing.T) *OsuDB {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = db.Conn.Ping()
+	err = db.Ctrl.Ping()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -35,7 +35,7 @@ func TestUserTable(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	rows, err := db.Conn.Query("SHOW TABLES;")
+	rows, err := db.Ctrl.Query("SHOW TABLES;")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -67,7 +67,7 @@ func TestUserTable(t *testing.T) {
 
 func TestGetUser(t *testing.T) {
 	db := connect(t)
-	_, err := db.Conn.Exec(`
+	_, err := db.Ctrl.Exec(`
 INSERT INTO users (user_id, username, playcount, rank, pp, acc, total_play)
 VALUES ('114514', 'avimitin', '100', '1', '999', '99', '1919810')
 `)
@@ -86,7 +86,7 @@ VALUES ('114514', 'avimitin', '100', '1', '999', '99', '1919810')
 
 func cleanUser(t *testing.T, db *OsuDB) {
 	t.Log("clean")
-	_, err := db.Conn.Exec(`
+	_, err := db.Ctrl.Exec(`
 DELETE FROM users WHERE user_id = '114514';
 	`)
 	if err != nil {
@@ -96,7 +96,7 @@ DELETE FROM users WHERE user_id = '114514';
 
 func TestGetUserYtd(t *testing.T) {
 	db := connect(t)
-	_, err := db.Conn.Exec(`
+	_, err := db.Ctrl.Exec(`
 INSERT INTO users (user_id, username, playcount_ytd, rank_ytd, pp_ytd, acc_ytd, total_play_ytd)
 VALUES ('114514', 'avimitin', '100', '1', '999', '99', '1919810')
 `)
