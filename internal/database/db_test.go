@@ -92,6 +92,12 @@ DELETE FROM users WHERE user_id = '114514';
 	if err != nil {
 		t.Errorf("Clean failed: %v", err)
 	}
+	_, err = db.Ctrl.Exec(`
+ALTER TABLE users AUTO_INCREMENT = 1;
+	`)
+	if err != nil {
+		t.Errorf("Clean failed: %v", err)
+	}
 }
 
 func TestGetUserYtd(t *testing.T) {
