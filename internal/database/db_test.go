@@ -35,33 +35,9 @@ func TestUserTable(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	rows, err := db.Ctrl.Query("SHOW TABLES;")
-	if err != nil {
-		t.Fatal(err)
-	}
-	var tables []string
-	for rows.Next() {
-		var table string
-		rowErr := rows.Scan(&table)
-		if rowErr != nil {
-			t.Fatal(err)
-		}
-		tables = append(tables, table)
-	}
-
-	var want = "users"
-	exist := false
-	if len(tables) == 0 {
-		t.Errorf("no table")
-	} else {
-		for _, t := range tables {
-			if t == want {
-				exist = true
-			}
-		}
-	}
+	exist := db.TableExist()
 	if !exist {
-		t.Errorf("%s not found, got %v", want, tables)
+		t.Error("table not found")
 	}
 }
 
