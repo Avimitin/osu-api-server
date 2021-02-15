@@ -4,10 +4,19 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 type MySQLDataStore struct {
 	db *sql.DB
+}
+
+func NewMySQLStore(dsn string) (mds *MySQLDataStore, err error) {
+	db, err := sql.Open("mysql", dsn)
+	if err != nil {
+		return nil, err
+	}
+	return &MySQLDataStore{db}, nil
 }
 
 func (mds *MySQLDataStore) CheckHealth() error {
