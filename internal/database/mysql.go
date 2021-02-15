@@ -52,27 +52,17 @@ func (mds *MySQLDataStore) CheckHealth() error {
 }
 
 func MySQLInitTable(db *sql.DB) error {
-	const userTable = `
-CREATE TABLE IF NOT EXISTS users(
-	id INT AUTO_INCREMENT,
-	user_id VARCHAR(18) NOT NULL,
-	username VARCHAR(255) NOT NULL,
-	playcount VARCHAR(18),
-	rank VARCHAR(18),
-	pp VARCHAR(18),
-	acc VARCHAR(18),
-	total_play VARCHAR(18),
-	playcount_ytd VARCHAR(18),
-	rank_ytd VARCHAR(18),
-	pp_ytd VARCHAR(18),
-	acc_ytd VARCHAR(18),
-	total_play_ytd VARCHAR(18),
-	PRIMARY KEY (id)
-)CHARSET=utf8mb4
-	`
-	_, err := db.Exec(userTable)
+	_, err := db.Exec(tableUsers)
 	if err != nil {
-		return fmt.Errorf("init table: %s:%v", userTable, err)
+		return fmt.Errorf("init table: %s:%v", tableUsers, err)
+	}
+	_, err = db.Exec(tableRecentData)
+	if err != nil {
+		return fmt.Errorf("init table: %s:%v", tableRecentData, err)
+	}
+	_, err = db.Exec(tableYesterdayData)
+	if err != nil {
+		return fmt.Errorf("init table: %s:%v", tableYesterdayData, err)
 	}
 	return nil
 }
