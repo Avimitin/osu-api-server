@@ -24,17 +24,13 @@ func init() {
 		log.Fatal(err)
 	}
 	log.Println("config initialized")
-	db, err = database.Connect(cfg.DBSec.EncodeDSN())
+	db, err = database.Connect("mysql", cfg.DBSec.EncodeDSN())
 	if err != nil {
 		log.Fatal(err)
 	}
 	log.Println("database connected")
-	if !db.TableExist() {
-		log.Println("table not found")
-		if e := db.InitTable(); e != nil {
-			log.Fatal(e)
-		}
-		log.Println("table `users` built")
+	if err = db.CheckUserDataStoreHealth(); err != nil {
+		log.Fatalf("check database health:%v", err)
 	}
 }
 
