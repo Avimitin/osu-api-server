@@ -2,8 +2,8 @@ package database
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
-	"log"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -11,57 +11,34 @@ import (
 
 //OsuDB contain sql.DB field
 type OsuDB struct {
-	Ctrl *sql.DB
+	UsersData PlayerDataStore
 }
 
 // Connect return database connection by given DSN
-func Connect(dsn string) (*OsuDB, error) {
-	db, err := sql.Open("mysql", dsn)
-	if err != nil {
-		return nil, fmt.Errorf("connect %s:%v", dsn, err)
-	}
-	// Set limit
-	if db != nil {
-		db.SetConnMaxLifetime(time.Minute * 3)
-		db.SetMaxOpenConns(10)
-		db.SetMaxIdleConns(10)
+func Connect(driver string, dsn string) (*OsuDB, error) {
+	var store PlayerDataStore
+	switch driver {
+	case "mysql":
+		store = &MySQLDataStore{}
+		db, err := sql.Open(driver, dsn)
+		if err != nil {
+			return nil, fmt.Errorf("connect %s:%v", dsn, err)
+		}
+		// Set limit
+		if db != nil {
+			db.SetConnMaxLifetime(time.Minute * 3)
+			db.SetMaxOpenConns(10)
+			db.SetMaxIdleConns(10)
+		}
+	default:
+		return nil, errors.New("unsupport database driver")
 	}
 
-	return &OsuDB{Ctrl: db}, nil
+	return &OsuDB{store}, nil
 }
 
-// InitTable initialize table at setup
-func (db *OsuDB) InitTable() error {
-	return initUserTable(db.Ctrl)
-}
-
-func (db *OsuDB) TableExist() bool {
-	rows, err := db.Ctrl.Query("SHOW TABLES;")
-	if err != nil {
-		log.Fatal(err)
-	}
-	var tables []string
-	for rows.Next() {
-		var table string
-		rowErr := rows.Scan(&table)
-		if rowErr != nil {
-			log.Fatal(err)
-		}
-		tables = append(tables, table)
-	}
-
-	var want = "users"
-	exist := false
-	if len(tables) == 0 {
-		return false
-	} else {
-		for _, t := range tables {
-			if t == want {
-				exist = true
-			}
-		}
-	}
-	return exist
+func (db *OsuDB) CheckUserDataStoreHealth() error {
+	return db.UsersData.CheckHealth()
 }
 
 // User type contain user field
@@ -82,117 +59,55 @@ type User struct {
 
 // GetUserRecent return user data with given name
 func (db *OsuDB) GetUserRecent(username string) (*User, error) {
-	const query = "SELECT username, playcount, rank, pp, acc, total_play FROM users WHERE username = ? OR user_id = ?"
-	u := &User{}
-	stmtOut, err := db.Ctrl.Prepare(query)
-	defer stmtOut.Close()
-	err = stmtOut.QueryRow(username, username).Scan(
-		&u.Username, &u.PlayCount, &u.Rank, &u.PP, &u.Acc, &u.TotalPlay)
-	if err != nil {
-		return nil, fmt.Errorf("query %s : %v", query, err)
-	}
-	if u == nil {
-		return nil, fmt.Errorf("user %s not found", username)
-	}
-	return u, nil
+	return db.UsersData.GetPlayer(username)
 }
 
 // GetUserYtd return a user's yesterday data with given name
 func (db *OsuDB) GetUserYtd(username string) (*User, error) {
-	const query = `
-SELECT username, playcount_ytd, rank_ytd, pp_ytd, acc_ytd, total_play_ytd 
-FROM users 
-WHERE username = ? OR user_id = ?
-`
-
-	stmtOut, err := db.Ctrl.Prepare(query)
-	if err != nil {
-		return nil, fmt.Errorf("query %s : %v", query, err)
-	}
-	defer stmtOut.Close()
-
-	u := &User{}
-	err = stmtOut.QueryRow(username, username).Scan(
-		&u.Username, &u.PcYtd, &u.RankYtd, &u.PpYtd, &u.AccYtd, &u.TotalPlayYtd,
-	)
-	if err != nil {
-		return nil, fmt.Errorf("scan %s : %v", query, err)
-	}
-	return u, nil
+	return db.UsersData.GetPlayerOld(username)
 }
 
 // InsertNewUser insert user data into database
 func (db *OsuDB) InsertNewUser(
 	userID string, username string, pc string, rank string, pp string, acc string, total_play string,
 ) error {
-	const query = `
-INSERT INTO users (
-	user_id, username, playcount, rank, pp, acc, total_play
-) VALUES (
-	?,?,?,?,?,?,?
-)
-`
-	err := db.modify(query, userID, username, pc, rank, pp, acc, total_play)
-	if err != nil {
-		return err
-	}
-	return nil
+	return db.UsersData.AddPlayer(
+		User{
+			UserID:    userID,
+			Username:  username,
+			PlayCount: pc,
+			Rank:      rank,
+			PP:        pp,
+			Acc:       acc,
+			TotalPlay: total_play,
+		})
 }
 
 // UpdateUser update user data with given data
 func (db *OsuDB) UpdateUser(
 	username string, pc string, rank string, pp string, acc string, total_play string,
 ) error {
-	const query = `
-UPDATE users
-SET playcount=?, rank=?, pp=?, acc=?, total_play=?
-WHERE username=?
-`
-	err := db.modify(query, pc, rank, pp, acc, total_play, username)
-	if err != nil {
-		return err
-	}
-	return nil
+	return db.UsersData.Update(
+		User{
+			Username:  username,
+			PlayCount: pc,
+			Rank:      rank,
+			PP:        pp,
+			Acc:       acc,
+			TotalPlay: total_play,
+		})
 }
 
 func (db *OsuDB) UpdateUserYtd(
 	username string, pc string, rank string, pp string, acc string, total_play string,
 ) error {
-	const query = `
-UPDATE users
-SET playcount_ytd=?, rank_ytd=?, pp_ytd=?, acc_ytd=?, total_play_ytd=?
-WHERE username=?
-`
-	err := db.modify(query, pc, rank, pp, acc, total_play, username)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func initUserTable(db *sql.DB) error {
-	const userTable = `
-CREATE TABLE IF NOT EXISTS users(
-	id INT AUTO_INCREMENT,
-	user_id VARCHAR(18) NOT NULL,
-	username VARCHAR(255) NOT NULL,
-	playcount VARCHAR(18),
-	rank VARCHAR(18),
-	pp VARCHAR(18),
-	acc VARCHAR(18),
-	total_play VARCHAR(18),
-	playcount_ytd VARCHAR(18),
-	rank_ytd VARCHAR(18),
-	pp_ytd VARCHAR(18),
-	acc_ytd VARCHAR(18),
-	total_play_ytd VARCHAR(18),
-	PRIMARY KEY (id)
-)CHARSET=utf8mb4
-	`
-	_, err := db.Exec(userTable)
-	if err != nil {
-		return fmt.Errorf("init table: %s:%v", userTable, err)
-	}
-
-	return nil
+	return db.UsersData.UpdateOld(
+		User{
+			Username:     username,
+			PcYtd:        pc,
+			RankYtd:      rank,
+			PpYtd:        pp,
+			AccYtd:       acc,
+			TotalPlayYtd: total_play,
+		})
 }
