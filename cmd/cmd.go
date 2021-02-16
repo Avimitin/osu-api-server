@@ -14,7 +14,7 @@ func main() {
 	}
 
 	var err error
-	if err = server.PrepareSever(); err != nil {
+	if err = server.PrepareServer(); err != nil {
 		log.Fatalf("preparing server:%v", err)
 	}
 
