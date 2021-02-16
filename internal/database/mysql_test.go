@@ -10,8 +10,9 @@ import (
 )
 
 var (
-	db       *MySQLDataStore
-	fixtures *testfixtures.Loader
+	db          *MySQLDataStore
+	fixtures    *testfixtures.Loader
+	projectPath = os.Getenv("osuapi_project_root")
 )
 
 func InitTestfixtures(dir string) error {
@@ -44,7 +45,7 @@ func prepareTestDatabase(t testing.TB) {
 func TestMain(m *testing.M) {
 	var err error
 
-	err = InitTestfixtures(os.Getenv("osuapi_project_root") + "/internal/database/fixtures/")
+	err = InitTestfixtures(projectPath + "/internal/database/fixtures/")
 	if err != nil {
 		fatalF("init test fixtures: %v", err)
 	}
