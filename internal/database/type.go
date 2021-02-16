@@ -11,16 +11,20 @@ type PlayerDataStore interface {
 
 // User type contain user field
 type User struct {
-	UserID    string `json:"user_id"`
-	Username  string `json:"username"`
-	PlayCount Date   `json:"play_count"`
-	Rank      Date   `json:"rank"`
-	PP        Date   `json:"pp"`
-	Acc       Date   `json:"acc"`
-	PlayTime  Date   `json:"play_time"`
+	UserID   string `json:"user_id"`
+	Username string `json:"username"`
+	Date
+}
+
+type Data struct {
+	PlayCount string `json:"play_count"`
+	Rank      string `json:"rank"`
+	PP        string `json:"pp"`
+	Acc       string `json:"acc"`
+	PlayTime  string `json:"play_time"`
 }
 
 type Date struct {
-	Recent    string `json:"recent"`
-	Yesterday string `json:"yesterday"`
+	Recent    Data `json:"recent"`
+	Yesterday Data `json:"yesterday"`
 }
