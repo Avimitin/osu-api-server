@@ -21,6 +21,10 @@ func InitTestfixtures(dir string) error {
 	if err != nil {
 		return fmt.Errorf("connect to database: %v", err)
 	}
+	err = db.CheckHealth()
+	if err != nil {
+		return fmt.Errorf("check health: %v", err)
+	}
 	fixtures, err = testfixtures.New(
 		testfixtures.Database(db.db),
 		testfixtures.Dialect("mysql"),
