@@ -35,6 +35,29 @@ CREATE TABLE IF NOT EXISTS recent_data (
 	 FOREIGN    KEY(id) REFERENCES users(id)
  )CHARSET=utf8mb4
 `)
+
+	queryUser = `
+SELECT
+	users.username,
+	recent_data.play_count,
+	recent_data.rank,
+	recent_data.pp,
+	recent_data.acc,
+	recent_data.play_time
+FROM
+	users, recent_data
+WHERE
+	users.username=?
+AND
+	recent_data.id=(
+	SELECT
+		id
+	FROM
+		users
+	WHERE
+		username=?
+)
+`
 )
 
 // replace replace all the double quote to backtick
