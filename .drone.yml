@@ -6,6 +6,9 @@ platform:
   os: linux
   arch: amd64
 
+workspace:
+  - path: /go
+
 trigger:
   event:
     - push
