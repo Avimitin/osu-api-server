@@ -34,15 +34,25 @@ func (mds *MySQLDataStore) CheckHealth() error {
 		tables = append(tables, table)
 	}
 
-	var want = "users"
-	exist := false
+	var want []string = []string{"users", "recent_data", "yesterday_data"}
+	wantMatch := len(want)
+	var exist = false
+
 	if len(tables) == 0 {
 		return errors.New("no table")
 	} else {
+		var match int
 		for _, t := range tables {
-			if t == want {
-				exist = true
+			for _, w := range want {
+				if t == w {
+					match++
+					break
+				}
 			}
+		}
+
+		if wantMatch == match {
+			exist = true
 		}
 	}
 	if !exist {
