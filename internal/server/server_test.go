@@ -87,7 +87,7 @@ func TestGetDiff(t *testing.T) {
 			&database.User{
 				PP:        "4000.50",
 				Acc:       "97.89052605628967",
-				TotalPlay: "2478401",
+				PlayTime: "2478401",
 				PlayCount: "25000",
 				Rank:      "57",
 			},

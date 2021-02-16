@@ -159,7 +159,7 @@ func getUserDiff(current *api.User, local *database.User) (*Different, error) {
 	if err != nil {
 		return nil, fmt.Errorf("cast playcount: %v", err)
 	}
-	totalpLocal, err := parseInt64(local.TotalPlay)
+	totalpLocal, err := parseInt64(local.PlayTime)
 	if err != nil {
 		return nil, fmt.Errorf("cast total_play: %v", err)
 	}
