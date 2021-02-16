@@ -131,7 +131,18 @@ func getPlayerDataByName(name string) (*Player, error) {
 	return p, nil
 }
 
-func getUserDiff(current *api.User, local *database.User) (*Different, error) {
+// getUserDiff return data with given date and current data different
+func getUserDiff(current *api.User, with string, local *database.Date) (*Different, error) {
+	var data database.Data
+	switch with {
+	case "recent":
+		data = local.Recent
+	case "yesterday":
+		data = local.Yesterday
+	default:
+		return nil, errors.New("invalid data date")
+	}
+
 	// cast latest data
 	pc, err := parseInt64(current.Playcount)
 	if err != nil {
@@ -155,23 +166,23 @@ func getUserDiff(current *api.User, local *database.User) (*Different, error) {
 	}
 
 	// cast local data
-	pcLocal, err := parseInt64(local.PlayCount)
+	pcLocal, err := parseInt64(data.PlayCount)
 	if err != nil {
 		return nil, fmt.Errorf("cast playcount: %v", err)
 	}
-	totalpLocal, err := parseInt64(local.PlayTime)
+	totalpLocal, err := parseInt64(data.PlayTime)
 	if err != nil {
 		return nil, fmt.Errorf("cast total_play: %v", err)
 	}
-	accLocal, err := parseFloat(local.Acc)
+	accLocal, err := parseFloat(data.Acc)
 	if err != nil {
 		return nil, fmt.Errorf("cast acc: %v", err)
 	}
-	rankLocal, err := atoi(local.Rank)
+	rankLocal, err := atoi(data.Rank)
 	if err != nil {
 		return nil, fmt.Errorf("cast rank: %v", err)
 	}
-	ppLocal, err := parseFloat(local.PP)
+	ppLocal, err := parseFloat(data.PP)
 	if err != nil {
 		return nil, fmt.Errorf("cast pp: %v", err)
 	}
