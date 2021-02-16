@@ -83,13 +83,15 @@ func TestGetDiff(t *testing.T) {
 				Playcount:          "14085",
 				TotalSecondsPlayed: "1041175",
 				PpRank:             "111254",
-			},
-			&database.User{
-				PP:        "4000.50",
-				Acc:       "97.89052605628967",
-				PlayTime: "2478401",
-				PlayCount: "25000",
-				Rank:      "57",
+			}, "recent",
+			&database.Date{
+				Recent: database.Data{
+					PP:        "4000.50",
+					Acc:       "97.89052605628967",
+					PlayTime:  "2478401",
+					PlayCount: "25000",
+					Rank:      "57",
+				},
 			},
 		)
 		if err != nil {
