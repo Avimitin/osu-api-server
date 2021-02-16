@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strings"
+
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -80,26 +82,20 @@ func MySQLInitTable(db *sql.DB) error {
 }
 
 func (mds *MySQLDataStore) GetPlayer(username string) (*User, error) {
-	const query = `
-SELECT
-	username, playcount, rank, pp, acc, total_play 
-FROM
-	users
-WHERE
-	username = ?
-OR
-	user_id = ?
-`
 	u := &User{}
+	query := queryUser
 	stmtOut, err := mds.db.Prepare(query)
+	if err != nil {
+		return nil, fmt.Errorf("prepare %s: %v", query, err)
+	}
 	defer stmtOut.Close()
 	err = stmtOut.QueryRow(username, username).Scan(
 		&u.Username, &u.PlayCount, &u.Rank, &u.PP, &u.Acc, &u.TotalPlay)
 	if err != nil {
-		return nil, fmt.Errorf("query %s : %v", query, err)
-	}
-	if u == nil {
-		return nil, fmt.Errorf("user %s not found", username)
+		if strings.Contains(err.Error(), "no rows in result set") {
+			return nil, fmt.Errorf("user %s not found", username)
+		}
+		return nil, fmt.Errorf("query %s with param %s: %v", query, username, err)
 	}
 	return u, nil
 }
