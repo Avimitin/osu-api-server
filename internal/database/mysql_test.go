@@ -62,53 +62,107 @@ func TestGetPlayer(t *testing.T) {
 	prepareTestDatabase(t)
 
 	t.Run("get cookiezi", func(t *testing.T) {
-		if !assertSameUser(t, "shigetora") {
+		if !assertSameUser(t, "recent", "shigetora") {
 			t.Errorf("cookiezi data mismatch")
 		}
 	})
 	t.Run("get avimitin", func(t *testing.T) {
-		if !assertSameUser(t, "avimitin") {
+		if !assertSameUser(t, "recent", "avimitin") {
 			t.Errorf("avimitin data mismatch")
 		}
 	})
 	t.Run("try to get tuna", func(t *testing.T) {
-		if assertSameUser(t, "flyingtuna") {
+		if assertSameUser(t, "recent", "flyingtuna") {
 			t.Errorf("unexpected user flyingtuna")
 		}
 	})
 }
 
-func assertSameUser(t testing.TB, want string) bool {
+func TestGetPlayerOldData(t *testing.T) {
+	prepareTestDatabase(t)
+	t.Run("get whitecat", func(t *testing.T) {
+		if !assertSameUser(t, "yesterday", "whitecat") {
+			t.Errorf("whitecat data mismatch")
+		}
+	})
+	t.Run("get avimitin", func(t *testing.T) {
+		if !assertSameUser(t, "yesterday", "avimitin") {
+			t.Errorf("avimitin data mismatch")
+		}
+	})
+	t.Run("try to get tuna", func(t *testing.T) {
+		if assertSameUser(t, "yesterday", "flyingtuna") {
+			t.Errorf("unexpected user flyingtuna")
+		}
+	})
+}
+
+func assertSameUser(t testing.TB, date string, want string) bool {
 	t.Helper()
-	u, err := db.GetPlayer(want)
+	var u *User
+	var err error
+	switch date {
+	case "recent":
+		u, err = db.GetPlayer(want)
+		if exist := assertUserError(t, err); !exist {
+			return false
+		}
+
+		var got = u.Username
+		if !assertSameStr(t, got, want) {
+			return false
+		}
+
+		switch want {
+		case "avimitin":
+			got = u.Recent.PlayCount
+			want = "114514"
+			return assertSameStr(t, got, want)
+		case "shigetora":
+			got = u.Recent.PlayTime
+			want = "2478401"
+			return assertSameStr(t, got, want)
+		}
+
+	case "yesterday":
+		u, err = db.GetPlayerOld(want)
+		if exist := assertUserError(t, err); !exist {
+			return false
+		}
+
+		var got = u.Username
+		if !assertSameStr(t, got, want) {
+			return false
+		}
+
+		switch want {
+		case "avimitin":
+			got = u.Yesterday.PlayCount
+			want = "114500"
+			return assertSameStr(t, got, want)
+		case "whitecat":
+			got = u.Yesterday.PlayTime
+			want = "1520200"
+			return assertSameStr(t, got, want)
+		}
+	}
+	return true
+}
+
+func assertSameStr(t testing.TB, got string, want string) bool {
+	t.Helper()
+	if got != want {
+		t.Errorf("got %s want %s", got, want)
+	}
+	return true
+}
+
+func assertUserError(t testing.TB, err error) bool {
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
 			return false
 		}
 		t.Fatal(err)
-	}
-
-	var got = u.Username
-	if got != want {
-		t.Errorf("got %v want %v", got, want)
-		return false
-	}
-
-	switch want {
-	case "avimitin":
-		got = u.Recent.PlayCount
-		want = "114514"
-		if got != "114514" {
-			t.Errorf("got %s want %s", got, want)
-			return false
-		}
-	case "shigetora":
-		got = u.Recent.PlayTime
-		want = "2478401"
-		if got != want {
-			t.Errorf("got %s want %s", got, want)
-			return false
-		}
 	}
 	return true
 }
