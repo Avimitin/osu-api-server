@@ -35,6 +35,10 @@ steps:
 
   - name: test
     image: golang:1.15
+    environment:
+      api_key:
+        from_secret: osu_api_key
+      osuapi_project_root: "."
     commands:
       - "go test -v ./..."
 
