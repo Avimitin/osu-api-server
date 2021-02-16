@@ -114,6 +114,9 @@ func (mds *MySQLDataStore) GetPlayerOld(username string) (*User, error) {
 		&u.Yesterday.PlayCount, &u.Yesterday.Rank, &u.Yesterday.PP, &u.Yesterday.Acc, &u.Yesterday.PlayTime,
 	)
 	if err != nil {
+		if strings.Contains(err.Error(), "no rows in result set") {
+			return nil, fmt.Errorf("user %s not found", username)
+		}
 		return nil, fmt.Errorf("scan %s : %v", query, err)
 	}
 	return u, nil
