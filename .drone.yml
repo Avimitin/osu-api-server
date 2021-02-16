@@ -7,7 +7,8 @@ platform:
   arch: amd64
 
 workspace:
-  - path: /go
+  base: /go
+  path: /src/github.com/avimitin/osuapi
 
 trigger:
   event:
@@ -28,7 +29,7 @@ steps:
     environment:
       api_key:
         from_secret: osu_api_key
-      osuapi_project_root: "/go/osuapi"
+      osuapi_project_root: "/go/src/github.com/avimitin/osuapi"
     commands:
       - "go get ./..."
       - "echo 'waiting for mariadb setting up'"
