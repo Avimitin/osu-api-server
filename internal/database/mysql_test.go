@@ -41,7 +41,7 @@ func prepareTestDatabase(t testing.TB) {
 func TestMain(m *testing.M) {
 	var err error
 
-	err = InitTestfixtures(os.Getenv("osuapi_project_root"))
+	err = InitTestfixtures(os.Getenv("osuapi_project_root") + "/internal/database/fixtures/")
 	if err != nil {
 		fatalF("init test fixtures: %v", err)
 	}
