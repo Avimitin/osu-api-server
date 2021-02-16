@@ -18,20 +18,20 @@ var (
 	db *database.OsuDB
 )
 
-func init() {
+// PrepareServer initialized all the service
+func PrepareServer() error {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("server prepare config: %v", err)
 	}
-	log.Println("config initialized")
 	db, err = database.Connect("mysql", cfg.DBSec.EncodeDSN())
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("connect to %s:%v", cfg.DBSec.EncodeDSN(), err)
 	}
-	log.Println("database connected")
 	if err = db.CheckUserDataStoreHealth(); err != nil {
-		log.Fatalf("check database health:%v", err)
+		return fmt.Errorf("check database health:%v", err)
 	}
+	return nil
 }
 
 type PlayerData interface {
