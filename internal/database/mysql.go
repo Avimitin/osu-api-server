@@ -90,7 +90,7 @@ func (mds *MySQLDataStore) GetPlayer(username string) (*User, error) {
 	}
 	defer stmtOut.Close()
 	err = stmtOut.QueryRow(username, username).Scan(
-		&u.Username, &u.PlayCount, &u.Rank, &u.PP, &u.Acc, &u.PlayTime)
+		&u.Username, &u.Recent.PlayCount, &u.Recent.Rank, &u.Recent.PP, &u.Recent.Acc, &u.Recent.PlayTime)
 	if err != nil {
 		if strings.Contains(err.Error(), "no rows in result set") {
 			return nil, fmt.Errorf("user %s not found", username)
@@ -110,7 +110,8 @@ func (mds *MySQLDataStore) GetPlayerOld(username string) (*User, error) {
 
 	u := &User{}
 	err = stmtOut.QueryRow(username, username).Scan(
-		&u.Username, &u.PcYtd, &u.RankYtd, &u.PpYtd, &u.AccYtd, &u.TotalPlayYtd,
+		&u.Username,
+		&u.Yesterday.PlayCount, &u.Yesterday.Rank, &u.Yesterday.PP, &u.Yesterday.Acc, &u.Yesterday.PlayTime,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("scan %s : %v", query, err)
@@ -126,7 +127,9 @@ INSERT INTO users (
 	?,?,?,?,?,?,?
 )
 `
-	err := mds.modify(query, u.UserID, u.Username, u.PlayCount, u.Rank, u.PP, u.Acc, u.PlayTime)
+	err := mds.modify(
+		query, u.UserID, u.Username,
+		u.Recent.PlayCount, u.Recent.Rank, u.Recent.PP, u.Recent.Acc, u.Recent.PlayTime)
 	if err != nil {
 		return err
 	}
@@ -142,7 +145,8 @@ SET
 WHERE 
 	username=?
 `
-	err := mds.modify(query, u.PlayCount, u.Rank, u.PP, u.Acc, u.PlayTime, u.Username)
+	err := mds.modify(query,
+		u.Recent.PlayCount, u.Recent.Rank, u.Recent.PP, u.Recent.Acc, u.Recent.PlayTime, u.Username)
 	if err != nil {
 		return err
 	}
@@ -158,7 +162,10 @@ SET
 WHERE
 	username=?
 `
-	err := mds.modify(query, u.PcYtd, u.RankYtd, u.PpYtd, u.AccYtd, u.TotalPlayYtd, u.Username)
+	err := mds.modify(
+		query,
+		u.Yesterday.PlayCount, u.Yesterday.Rank, u.Yesterday.PP, u.Yesterday.Acc, u.Yesterday.PlayTime,
+		u.Username)
 	if err != nil {
 		return err
 	}
