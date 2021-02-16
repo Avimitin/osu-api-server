@@ -23,25 +23,19 @@ services:
       MYSQL_PASSWORD: osu_test
 
 steps:
-  - name: setup
-    image: golang:1.15
-    commands:
-      - "go get ./..."
-    when:
-      branch:
-        - master
-
-  - name: build
-    image: golang:1.15
-    commands:
-      - "go build -ldflags '-w -s' -o bin/oas_linux_amd64 cmd/cmd.go"
-
-  - name: test
+  - name: server_test
     image: golang:1.15
     environment:
       api_key:
         from_secret: osu_api_key
-      osuapi_project_root: "."
+      osuapi_project_root: "/go/osuapi"
     commands:
+      - "go get ./..."
+      - "echo 'waiting for mariadb setting up'"
+      - "sleep 15"
+      - "go build -ldflags '-w -s' -o bin/oas_linux_amd64 cmd/cmd.go"
       - "go test -v ./..."
+    when:
+      branch:
+        - master
 
