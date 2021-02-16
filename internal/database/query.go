@@ -58,6 +58,28 @@ AND
 		username=?
 )
 `
+	queryUserOldData = `
+SELECT
+	users.username,
+	yesterday_data.play_count,
+	yesterday_data.rank,
+	yesterday_data.pp,
+	yesterday_data.acc,
+	yesterday_data.play_time
+FROM
+	users, yesterday_data
+WHERE
+	users.username=?
+AND
+	yesterday_data.id=(
+	SELECT
+		id
+	FROM
+		users
+	WHERE
+		username=?
+)
+`
 )
 
 // replace replace all the double quote to backtick
