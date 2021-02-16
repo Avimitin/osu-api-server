@@ -118,7 +118,7 @@ func getPlayerDataByName(name string) (*Player, error) {
 	}
 	var diff *Different
 	if lu != nil {
-		diff, e = getUserDiff(user, lu)
+		diff, e = getUserDiff(user, "recent", &lu.Date)
 	}
 	if e != nil {
 		return nil, e
