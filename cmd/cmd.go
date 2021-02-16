@@ -13,8 +13,13 @@ func main() {
 		Data: &server.OsuPlayerData{},
 	}
 
+	var err error
+	if err = server.PrepareSever(); err != nil {
+		log.Fatalf("preparing server:%v", err)
+	}
+
 	log.Println("server listening on port 11451")
-	if err := http.ListenAndServe(":11451", OsuSer); err != nil {
+	if err = http.ListenAndServe(":11451", OsuSer); err != nil {
 		log.Fatalf("handle %s : %v", ":11451", err)
 	}
 }
