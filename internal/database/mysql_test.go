@@ -18,7 +18,7 @@ var (
 func InitTestfixtures(dir string) error {
 	var err error
 	var dsn = "osu_test:osu_test@tcp(%s)/osu_test?charset=utf8mb4"
-	if host := os.Getenv("database host"); host != "" {
+	if host := os.Getenv("database_host"); host != "" {
 		dsn = fmt.Sprintf(dsn, host)
 	} else {
 		dsn = fmt.Sprintf(dsn, "localhost:3306")
