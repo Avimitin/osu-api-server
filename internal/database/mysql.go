@@ -83,7 +83,7 @@ func MySQLInitTable(db *sql.DB) error {
 
 func (mds *MySQLDataStore) GetPlayer(username string) (*User, error) {
 	u := &User{}
-	query := queryUser
+	query := queryUserRecentData
 	stmtOut, err := mds.db.Prepare(query)
 	if err != nil {
 		return nil, fmt.Errorf("prepare %s: %v", query, err)

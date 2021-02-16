@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS recent_data (
  )CHARSET=utf8mb4
 `)
 
-	queryUser = `
+	queryUserRecentData = `
 SELECT
 	users.username,
 	recent_data.play_count,
