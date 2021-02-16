@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"strconv"
 	"strings"
 
@@ -23,6 +24,9 @@ var (
 )
 
 func init() {
+	if key = os.Getenv("api_key"); key != "" {
+		return
+	}
 	conf, err := config.GetConfig()
 	if err != nil {
 		log.Fatal(err)
