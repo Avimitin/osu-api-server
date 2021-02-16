@@ -3,7 +3,7 @@ package database
 const (
 	tableUsers = `
 CREATE TABLE IF NOT EXISTS users (
-	id       INT NOT NULL AUTO_INCREMENTS,
+	id       INT NOT NULL AUTO_INCREMENT,
 	user_id  VARCHAR(18) NOT NULL UNIQUE,
 	username VARCHAR(255) NOT NULL,
 	PRIMARY  KEY (id)
