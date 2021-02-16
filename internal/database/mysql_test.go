@@ -63,12 +63,12 @@ func TestGetPlayer(t *testing.T) {
 
 	t.Run("get cookiezi", func(t *testing.T) {
 		if !assertSameUser(t, "shigetora") {
-			t.Errorf("cookiezi not found")
+			t.Errorf("cookiezi data mismatch")
 		}
 	})
 	t.Run("get avimitin", func(t *testing.T) {
 		if !assertSameUser(t, "avimitin") {
-			t.Errorf("avimitin not found")
+			t.Errorf("avimitin data mismatch")
 		}
 	})
 	t.Run("try to get tuna", func(t *testing.T) {
@@ -89,5 +89,26 @@ func assertSameUser(t testing.TB, want string) bool {
 	}
 
 	var got = u.Username
-	return got == want
+	if got != want {
+		t.Errorf("got %v want %v", got, want)
+		return false
+	}
+
+	switch want {
+	case "avimitin":
+		got = u.Recent.PlayCount
+		want = "114514"
+		if got != "114514" {
+			t.Errorf("got %s want %s", got, want)
+			return false
+		}
+	case "shigetora":
+		got = u.Recent.PlayTime
+		want = "2478401"
+		if got != want {
+			t.Errorf("got %s want %s", got, want)
+			return false
+		}
+	}
+	return true
 }
