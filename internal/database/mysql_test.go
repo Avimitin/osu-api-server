@@ -17,9 +17,14 @@ var (
 
 func InitTestfixtures(dir string) error {
 	var err error
-	db, err = NewMySQLStore(
-		"osu_test:osu_test@tcp(127.0.0.1:3306)/osu_test?charset=utf8mb4",
-	)
+	var dsn = "osu_test:osu_test@tcp(%s)/osu_test?charset=utf8mb4"
+	if host := os.Getenv("database host"); host != "" {
+		dsn = fmt.Sprintf(dsn, host)
+	} else {
+		dsn = fmt.Sprintf(dsn, "localhost:3306")
+	}
+
+	db, err = NewMySQLStore(dsn)
 	if err != nil {
 		return fmt.Errorf("connect to database: %v", err)
 	}
