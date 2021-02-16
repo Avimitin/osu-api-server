@@ -21,11 +21,10 @@ func InitTestfixtures(dir string) error {
 	if err != nil {
 		return fmt.Errorf("connect to database: %v", err)
 	}
-	testFiles := testfixtures.Files(dir)
 	fixtures, err = testfixtures.New(
 		testfixtures.Database(db.db),
 		testfixtures.Dialect("mysql"),
-		testFiles,
+		testfixtures.Directory(dir),
 	)
 	return err
 }
