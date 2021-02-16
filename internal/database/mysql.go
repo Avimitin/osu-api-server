@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"log"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -56,6 +57,7 @@ func (mds *MySQLDataStore) CheckHealth() error {
 	}
 
 	if !exist {
+		log.Println("database setting up table...")
 		return MySQLInitTable(mds.db)
 	}
 	return nil
