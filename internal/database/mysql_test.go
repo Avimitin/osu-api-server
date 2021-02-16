@@ -16,7 +16,7 @@ var (
 func InitTestfixtures(dir string) error {
 	var err error
 	db, err = NewMySQLStore(
-		"osu_test:osu_test@tcp(127.0.0.1:3306)/osu?charset=utf8mb4",
+		"osu_test:osu_test@tcp(127.0.0.1:3306)/osu_test?charset=utf8mb4",
 	)
 	if err != nil {
 		return fmt.Errorf("connect to database: %v", err)
