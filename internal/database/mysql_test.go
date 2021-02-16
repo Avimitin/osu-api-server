@@ -3,6 +3,7 @@ package database
 import (
 	"fmt"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/go-testfixtures/testfixtures/v3"
@@ -54,4 +55,38 @@ func TestMain(m *testing.M) {
 func fatalF(context string, args ...interface{}) {
 	fmt.Printf(context, args...)
 	os.Exit(1)
+}
+
+func TestGetPlayer(t *testing.T) {
+	prepareTestDatabase(t)
+
+	t.Run("get cookiezi", func(t *testing.T) {
+		if !assertSameUser(t, "shigetora") {
+			t.Errorf("cookiezi not found")
+		}
+	})
+	t.Run("get avimitin", func(t *testing.T) {
+		if !assertSameUser(t, "avimitin") {
+			t.Errorf("avimitin not found")
+		}
+	})
+	t.Run("try to get tuna", func(t *testing.T) {
+		if assertSameUser(t, "flyingtuna") {
+			t.Errorf("unexpected user flyingtuna")
+		}
+	})
+}
+
+func assertSameUser(t testing.TB, want string) bool {
+	t.Helper()
+	u, err := db.GetPlayer(want)
+	if err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			return false
+		}
+		t.Fatal(err)
+	}
+
+	var got = u.Username
+	return got == want
 }
