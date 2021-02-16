@@ -57,12 +57,13 @@ func (db *OsuDB) InsertNewUser(
 		User{
 			UserID:    userID,
 			Username:  username,
-			PlayCount: pc,
-			Rank:      rank,
-			PP:        pp,
-			Acc:       acc,
-			TotalPlay: total_play,
-		})
+			PlayCount: Date{Recent: pc},
+			Rank:      Date{Recent: rank},
+			PP:        Date{Recent: pp},
+			Acc:       Date{Recent: acc},
+			PlayTime:  Date{Recent: total_play},
+		},
+	)
 }
 
 // UpdateUser update user data with given data
@@ -72,11 +73,11 @@ func (db *OsuDB) UpdateUser(
 	return db.UsersData.Update(
 		User{
 			Username:  username,
-			PlayCount: pc,
-			Rank:      rank,
-			PP:        pp,
-			Acc:       acc,
-			TotalPlay: total_play,
+			PlayCount: Date{Recent: pc},
+			Rank:      Date{Recent: rank},
+			PP:        Date{Recent: pp},
+			Acc:       Date{Recent: acc},
+			PlayTime:  Date{Recent: total_play},
 		})
 }
 
@@ -85,11 +86,11 @@ func (db *OsuDB) UpdateUserYtd(
 ) error {
 	return db.UsersData.UpdateOld(
 		User{
-			Username:     username,
-			PcYtd:        pc,
-			RankYtd:      rank,
-			PpYtd:        pp,
-			AccYtd:       acc,
-			TotalPlayYtd: total_play,
+			Username:  username,
+			PlayCount: Date{Yesterday: pc},
+			Rank:      Date{Yesterday: rank},
+			PP:        Date{Yesterday: pp},
+			Acc:       Date{Yesterday: acc},
+			PlayTime:  Date{Yesterday: total_play},
 		})
 }
