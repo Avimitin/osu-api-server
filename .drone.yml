@@ -30,6 +30,7 @@ steps:
       api_key:
         from_secret: osu_api_key
       osuapi_project_root: "/go/src/github.com/avimitin/osuapi"
+      database_host: "database:3306"
     commands:
       - "go get ./..."
       - "echo 'waiting for mariadb setting up'"
