@@ -7,7 +7,7 @@ import (
 
 func TestGetConfig(t *testing.T) {
 	t.Run("get file from env", func(t *testing.T) {
-		os.Setenv("osu_conf_path", "/home/avimitin")
+		os.Setenv("osu_conf_path", os.Getenv("osuapi_project_root")+"/example/config")
 		got, err := GetConfig()
 		if err != nil {
 			t.Fatal(err)
@@ -16,9 +16,6 @@ func TestGetConfig(t *testing.T) {
 		if got.Key != want {
 			t.Errorf("got %s want %s", got, want)
 		}
-		_ = os.Unsetenv("osu_conf_path")
-	})
-
 		os.Unsetenv("osu_conf_path")
 	})
 }
