@@ -39,7 +39,6 @@ func (mds *MySQLDataStore) CheckHealth() error {
 	var exist = false
 
 	if len(tables) == 0 {
-		return errors.New("no table")
 	} else {
 		var match int
 		for _, t := range tables {
@@ -55,6 +54,7 @@ func (mds *MySQLDataStore) CheckHealth() error {
 			exist = true
 		}
 	}
+
 	if !exist {
 		return MySQLInitTable(mds.db)
 	}
