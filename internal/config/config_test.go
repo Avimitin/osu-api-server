@@ -19,16 +19,6 @@ func TestGetConfig(t *testing.T) {
 		_ = os.Unsetenv("osu_conf_path")
 	})
 
-	t.Run("get file from $HOME", func(t *testing.T) {
 		os.Unsetenv("osu_conf_path")
-
-		got, err := GetConfig()
-		if err != nil {
-			t.Fatal(err)
-		}
-		want := "hash"
-		if got.Key != want {
-			t.Errorf("got %s want %s", got, want)
-		}
 	})
 }
