@@ -14,6 +14,7 @@ services:
   - name: database
     image: mariadb
     environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
       MYSQL_DATABASE: osu_test
       MYSQL_USER: osu_test
       MYSQL_PASSWORD: osu_test
@@ -30,7 +31,7 @@ steps:
   - name: build
     image: golang:1.15
     commands:
-      - "go build -lsflags='-s -w' -o bin/oas_linux_amd64"
+      - "go build -ldflags '-w -s' -o bin/oas_linux_amd64"
 
   - name: test
     image: golang:1.15
