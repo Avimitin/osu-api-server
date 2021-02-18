@@ -35,24 +35,21 @@ func PrepareServer() error {
 
 type OsuServer struct {
 	Data PlayerData
+	http.Handler
 }
 
-func (osuSer *OsuServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	log.Printf("%s sent %s request to %s", r.RemoteAddr, r.Method, r.URL.Host+r.URL.Path)
-	w.Header().Set("Content-Type", "application/json")
-
-	var ok bool
-	ok = assertIsGetMethod(w, r)
-	if !ok {
-		return
+func NewOsuServer(store PlayerData) *OsuServer {
+	if store == nil {
+		panic("nil data store")
 	}
+	os := new(OsuServer)
+	os.Data = store
 
-	if !strings.HasPrefix(r.URL.Path, "/api/v1/players") {
-		fmt.Fprintf(w, `{"error":"page %s not found"}`, r.URL.Path)
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-	player := strings.TrimPrefix(r.URL.Path, "/api/v1/players/")
+	router := http.NewServeMux()
+	router.Handle("/api/v1/player", http.HandlerFunc(os.playerHandler))
+	os.Handler = router
+	return os
+}
 	stat, err := osuSer.Data.GetPlayerStat(player)
 	if err != nil {
 		log.Printf("get %s data: %v", player, err)
