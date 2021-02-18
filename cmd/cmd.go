@@ -8,13 +8,9 @@ import (
 )
 
 func main() {
-	// cast
-	OsuSer := &server.OsuServer{
-		Data: &server.OsuPlayerData{},
-	}
-
 	var err error
-	if err = server.PrepareServer(); err != nil {
+	var OsuSer *server.OsuServer
+	if OsuSer, err = server.PrepareServer(); err != nil {
 		log.Fatalf("preparing server:%v", err)
 	}
 
