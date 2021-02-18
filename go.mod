@@ -1,4 +1,4 @@
-module github.com/avimitin/osuapi
+module github.com/avimitin/osu-api-server
 
 go 1.15
 
