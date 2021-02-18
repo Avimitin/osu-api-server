@@ -29,7 +29,7 @@ func TestGetPlayer(t *testing.T) {
 		got := makeGetUserStatRequest("avimitin", response)
 		want := `{"username": "avimitin"}`
 
-		assertGetUser(t, got, want)
+		assertSameString(t, got, want)
 		assertStatus(t, response.Code, http.StatusOK)
 	})
 
@@ -38,16 +38,17 @@ func TestGetPlayer(t *testing.T) {
 		got := makeGetUserStatRequest("coooool", response)
 		want := `{"username": "coooool"}`
 
-		assertGetUser(t, got, want)
+		assertSameString(t, got, want)
 		assertStatus(t, response.Code, http.StatusOK)
 	})
 
-	t.Run("Get 404", func(t *testing.T) {
+	t.Run("Get error", func(t *testing.T) {
 		req := makeUserRequest("jixun")
 		response := httptest.NewRecorder()
 		ser := newSer()
 		ser.ServeHTTP(response, req)
-		assertStatus(t, response.Code, http.StatusNotFound)
+		assertSameString(t, response.Body.String(), `{"error": "user not found"}`)
+		assertStatus(t, response.Code, http.StatusInternalServerError)
 	})
 }
 
@@ -114,8 +115,8 @@ func assertStatus(t testing.TB, got, want int) {
 
 func makeUserRequest(username string) (request *http.Request) {
 	request, _ = http.NewRequest(http.MethodPost, "http://example.com/api/v1/player", nil)
-	request.PostForm.Add("player", username)
 	request.ParseForm()
+	request.PostForm.Add("player", username)
 	return request
 }
 
@@ -136,7 +137,7 @@ func newSer() *OsuServer {
 	return NewOsuServer(pdt)
 }
 
-func assertGetUser(t testing.TB, got, want string) {
+func assertSameString(t testing.TB, got, want string) {
 	t.Helper()
 	if got != want {
 		t.Errorf("got %s want %s", got, want)
