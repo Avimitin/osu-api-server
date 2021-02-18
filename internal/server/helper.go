@@ -1,8 +1,12 @@
 package server
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
+
+	"github.com/avimitin/osu-api-server/internal/api"
+	"github.com/avimitin/osu-api-server/internal/database"
 )
 
 func atoi(s string) (int, error) {
@@ -27,4 +31,74 @@ func parseFloat(s string) (float64, error) {
 		return -1.0, fmt.Errorf("cast %s to float32: %v", s, err)
 	}
 	return f, nil
+}
+
+func getUserDiff(current *api.User, with string, local *database.Date) (*Different, error) {
+	var data database.Data
+	switch with {
+	case "recent":
+		data = local.Recent
+	case "yesterday":
+		data = local.Yesterday
+	default:
+		return nil, errors.New("invalid data date")
+	}
+
+	// cast latest data
+	pc, err := parseInt64(current.Playcount)
+	if err != nil {
+		return nil, fmt.Errorf("cast playcount: %v", err)
+	}
+	totalp, err := parseInt64(current.TotalSecondsPlayed)
+	if err != nil {
+		return nil, fmt.Errorf("cast total_play: %v", err)
+	}
+	acc, err := parseFloat(current.Accuracy)
+	if err != nil {
+		return nil, fmt.Errorf("cast acc: %v", err)
+	}
+	rank, err := atoi(current.PpRank)
+	if err != nil {
+		return nil, fmt.Errorf("cast rank: %v", err)
+	}
+	pp, err := parseFloat(current.PpRaw)
+	if err != nil {
+		return nil, fmt.Errorf("cast pp: %v", err)
+	}
+
+	// cast local data
+	pcLocal, err := parseInt64(data.PlayCount)
+	if err != nil {
+		return nil, fmt.Errorf("cast playcount: %v", err)
+	}
+	totalpLocal, err := parseInt64(data.PlayTime)
+	if err != nil {
+		return nil, fmt.Errorf("cast total_play: %v", err)
+	}
+	accLocal, err := parseFloat(data.Acc)
+	if err != nil {
+		return nil, fmt.Errorf("cast acc: %v", err)
+	}
+	rankLocal, err := atoi(data.Rank)
+	if err != nil {
+		return nil, fmt.Errorf("cast rank: %v", err)
+	}
+	ppLocal, err := parseFloat(data.PP)
+	if err != nil {
+		return nil, fmt.Errorf("cast pp: %v", err)
+	}
+
+	// get data different
+	pcDiff := strconv.FormatInt(pc-pcLocal, 10)
+	totalpDiff := strconv.FormatInt(totalp-totalpLocal, 10)
+	accDiff := fmt.Sprintf("%.2f%%", acc-accLocal)
+	rankDiff := strconv.Itoa(rankLocal - rank)
+	ppDiff := fmt.Sprintf("%.3f", pp-ppLocal)
+	return &Different{
+		PlayCount: pcDiff,
+		TotalPlay: totalpDiff,
+		Acc:       accDiff,
+		Rank:      rankDiff,
+		PP:        ppDiff,
+	}, nil
 }
