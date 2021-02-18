@@ -40,6 +40,7 @@ type OsuServer struct {
 
 func (osuSer *OsuServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Printf("%s sent %s request to %s", r.RemoteAddr, r.Method, r.URL.Host+r.URL.Path)
+	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodGet {
 		fmt.Fprint(w, `{"error":"invalid method"}`)
 		w.WriteHeader(http.StatusBadRequest)
