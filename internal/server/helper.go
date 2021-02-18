@@ -3,6 +3,7 @@ package server
 import (
 	"errors"
 	"fmt"
+	"net/http"
 	"strconv"
 
 	"github.com/avimitin/osu-api-server/internal/api"
@@ -101,4 +102,13 @@ func getUserDiff(current *api.User, with string, local *database.Date) (*Differe
 		Rank:      rankDiff,
 		PP:        ppDiff,
 	}, nil
+}
+
+func assertIsGetMethod(w http.ResponseWriter, r *http.Request) bool {
+	if r.Method != http.MethodGet {
+		fmt.Fprint(w, `{"error":"invalid method"}`)
+		w.WriteHeader(http.StatusBadRequest)
+		return false
+	}
+	return true
 }

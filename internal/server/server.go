@@ -40,11 +40,13 @@ type OsuServer struct {
 func (osuSer *OsuServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Printf("%s sent %s request to %s", r.RemoteAddr, r.Method, r.URL.Host+r.URL.Path)
 	w.Header().Set("Content-Type", "application/json")
-	if r.Method != http.MethodGet {
-		fmt.Fprint(w, `{"error":"invalid method"}`)
-		w.WriteHeader(http.StatusBadRequest)
+
+	var ok bool
+	ok = assertIsGetMethod(w, r)
+	if !ok {
 		return
 	}
+
 	if !strings.HasPrefix(r.URL.Path, "/api/v1/players") {
 		fmt.Fprintf(w, `{"error":"page %s not found"}`, r.URL.Path)
 		w.WriteHeader(http.StatusNotFound)
