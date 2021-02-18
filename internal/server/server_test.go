@@ -131,9 +131,7 @@ func newSer() *OsuServer {
 			"avimitin": "avimitin",
 		},
 	}
-	return &OsuServer{
-		Data: pdt,
-	}
+	return NewOsuServer(pdt)
 }
 
 func assertGetUser(t testing.TB, got, want string) {
