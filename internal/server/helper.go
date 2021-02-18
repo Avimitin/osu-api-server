@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"regexp"
 	"strconv"
 
 	"github.com/avimitin/osu-api-server/internal/api"
@@ -111,4 +112,13 @@ func assertIsGetMethod(w http.ResponseWriter, r *http.Request) bool {
 		return false
 	}
 	return true
+}
+
+func hasPrefix(s string) (bool, string) {
+	reg := regexp.MustCompile(`^/api/v1/(\w+)/`)
+	matches := reg.FindStringSubmatch(s)
+	if len(matches) == 2 {
+		return true, matches[1]
+	}
+	return false, ""
 }
