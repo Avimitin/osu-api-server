@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/avimitin/osuapi/internal/config"
+	"github.com/avimitin/osu-api-server/internal/config"
 )
 
 const (

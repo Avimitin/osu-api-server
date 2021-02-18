@@ -9,9 +9,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/avimitin/osuapi/internal/api"
-	"github.com/avimitin/osuapi/internal/config"
-	"github.com/avimitin/osuapi/internal/database"
+	"github.com/avimitin/osu-api-server/internal/api"
+	"github.com/avimitin/osu-api-server/internal/config"
+	"github.com/avimitin/osu-api-server/internal/database"
 )
 
 var (

@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/avimitin/osuapi/internal/server"
+	"github.com/avimitin/osu-api-server/internal/server"
 )
 
 func main() {

@@ -7,8 +7,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/avimitin/osuapi/internal/api"
-	"github.com/avimitin/osuapi/internal/database"
+	"github.com/avimitin/osu-api-server/internal/api"
+	"github.com/avimitin/osu-api-server/internal/database"
 )
 
 type playerDataTest struct {
