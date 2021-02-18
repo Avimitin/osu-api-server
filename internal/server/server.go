@@ -13,24 +13,21 @@ import (
 	"github.com/avimitin/osu-api-server/internal/database"
 )
 
-var (
-	db *database.OsuDB
-)
-
 // PrepareServer initialized all the service
-func PrepareServer() error {
+func PrepareServer() (*OsuServer, error) {
 	cfg, err := config.GetConfig()
 	if err != nil {
-		return fmt.Errorf("server prepare config: %v", err)
+		return nil, fmt.Errorf("server prepare config: %v", err)
 	}
-	db, err = database.Connect("mysql", cfg.DBSec.EncodeDSN())
+	db, err := database.Connect("mysql", cfg.DBSec.EncodeDSN())
 	if err != nil {
-		return fmt.Errorf("connect to %s:%v", cfg.DBSec.EncodeDSN(), err)
+		return nil, fmt.Errorf("connect to %s:%v", cfg.DBSec.EncodeDSN(), err)
 	}
 	if err = db.CheckUserDataStoreHealth(); err != nil {
-		return fmt.Errorf("check database health:%v", err)
+		return nil, fmt.Errorf("check database health:%v", err)
 	}
-	return nil
+	opd := NewOsuPlayerData(db)
+	return NewOsuServer(opd), nil
 }
 
 // OsuServer is a http handler and it store player data
@@ -54,7 +51,9 @@ func NewOsuServer(store PlayerData) *OsuServer {
 }
 
 func (osuSer *OsuServer) playerHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	player := r.PostForm.Get("player")
+	log.Printf("%s:%s:%s", r.RemoteAddr, r.Method, player)
 	stat, err := osuSer.Data.GetPlayerStat(player)
 	if err != nil {
 		log.Printf("get %s data: %v", player, err)
@@ -65,10 +64,18 @@ func (osuSer *OsuServer) playerHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, stat)
 }
 
-type OsuPlayerData struct{}
+type OsuPlayerData struct {
+	db *database.OsuDB
+}
+
+func NewOsuPlayerData(db *database.OsuDB) *OsuPlayerData {
+	opd := new(OsuPlayerData)
+	opd.db = db
+	return opd
+}
 
 func (opd *OsuPlayerData) GetPlayerStat(name string) (string, error) {
-	p, e := getPlayerDataByName(name)
+	p, e := getPlayerDataByName(name, opd.db)
 	if e != nil {
 		return "", e
 	}
@@ -79,7 +86,7 @@ func (opd *OsuPlayerData) GetPlayerStat(name string) (string, error) {
 	return string(data), nil
 }
 
-func getPlayerDataByName(name string) (*Player, error) {
+func getPlayerDataByName(name string, db *database.OsuDB) (*Player, error) {
 	u, e := api.GetUsers(name)
 	if e != nil {
 		return nil, e
