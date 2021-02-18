@@ -34,10 +34,6 @@ func PrepareServer() error {
 	return nil
 }
 
-type PlayerData interface {
-	GetPlayerStat(name string) (string, error)
-}
-
 type OsuServer struct {
 	Data PlayerData
 }
@@ -66,19 +62,6 @@ func (osuSer *OsuServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 type OsuPlayerData struct{}
-
-type Player struct {
-	Data *api.User  `json:"latest_data"`
-	Diff *Different `json:"diff"`
-}
-
-type Different struct {
-	PlayCount string `json:"play_count"`
-	Rank      string `json:"rank"`
-	PP        string `json:"pp"`
-	Acc       string `json:"acc"`
-	TotalPlay string `json:"total_play"`
-}
 
 func (opd *OsuPlayerData) GetPlayerStat(name string) (string, error) {
 	p, e := getPlayerDataByName(name)
@@ -200,28 +183,4 @@ func getUserDiff(current *api.User, with string, local *database.Date) (*Differe
 		Rank:      rankDiff,
 		PP:        ppDiff,
 	}, nil
-}
-
-func atoi(s string) (int, error) {
-	i, e := strconv.Atoi(s)
-	if e != nil {
-		return -1, fmt.Errorf("cast %s to int: %v", s, e)
-	}
-	return i, nil
-}
-
-func parseInt64(s string) (int64, error) {
-	i, err := strconv.ParseInt(s, 10, 64)
-	if err != nil {
-		return -1, fmt.Errorf("cast %s to int64: %v", s, err)
-	}
-	return i, nil
-}
-
-func parseFloat(s string) (float64, error) {
-	f, err := strconv.ParseFloat(s, 64)
-	if err != nil {
-		return -1.0, fmt.Errorf("cast %s to float32: %v", s, err)
-	}
-	return f, nil
 }
