@@ -113,7 +113,9 @@ func assertStatus(t testing.TB, got, want int) {
 }
 
 func makeUserRequest(username string) (request *http.Request) {
-	request, _ = http.NewRequest(http.MethodGet, fmt.Sprintf("/api/v1/players/%s", username), nil)
+	request, _ = http.NewRequest(http.MethodPost, "http://example.com/api/v1/player", nil)
+	request.PostForm.Add("player", username)
+	request.ParseForm()
 	return request
 }
 
