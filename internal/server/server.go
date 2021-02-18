@@ -50,10 +50,13 @@ func NewOsuServer(store PlayerData) *OsuServer {
 	os.Handler = router
 	return os
 }
+
+func (osuSer *OsuServer) playerHandler(w http.ResponseWriter, r *http.Request) {
+	player := r.PostForm.Get("player")
 	stat, err := osuSer.Data.GetPlayerStat(player)
 	if err != nil {
 		log.Printf("get %s data: %v", player, err)
-		w.WriteHeader(http.StatusNotFound)
+		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprintf(w, `{"error": "%s"}`, err.Error())
 		return
 	}
