@@ -1,7 +1,6 @@
 package database
 
 import (
-	"database/sql"
 	"errors"
 	"fmt"
 	"time"
@@ -14,19 +13,23 @@ type OsuDB struct {
 
 // Connect return database connection by given DSN
 func Connect(driver string, dsn string) (*OsuDB, error) {
-	var store PlayerDataStore
+	var store *MySQLDataStore
+	var err error
 	switch driver {
 	case "mysql":
-		store = &MySQLDataStore{}
-		db, err := sql.Open(driver, dsn)
+		store, err = NewMySQLStore(dsn)
 		if err != nil {
 			return nil, fmt.Errorf("connect %s:%v", dsn, err)
 		}
 		// Set limit
-		if db != nil {
-			db.SetConnMaxLifetime(time.Minute * 3)
-			db.SetMaxOpenConns(10)
-			db.SetMaxIdleConns(10)
+		if store != nil {
+			store.db.SetConnMaxLifetime(time.Minute * 3)
+			store.db.SetMaxOpenConns(10)
+			store.db.SetMaxIdleConns(10)
+		}
+		err = store.db.Ping()
+		if err != nil {
+			return nil, fmt.Errorf("connect db: %v", err)
 		}
 	default:
 		return nil, errors.New("unsupport database driver")
@@ -36,6 +39,9 @@ func Connect(driver string, dsn string) (*OsuDB, error) {
 }
 
 func (db *OsuDB) CheckUserDataStoreHealth() error {
+	if db.UsersData == nil {
+		return errors.New("userdata has not yet initialized")
+	}
 	return db.UsersData.CheckHealth()
 }
 
