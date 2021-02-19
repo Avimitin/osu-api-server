@@ -3,6 +3,7 @@ package server
 import (
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -121,4 +122,16 @@ func hasPrefix(s string) (bool, string) {
 		return true, matches[1]
 	}
 	return false, ""
+}
+
+func fmtJsonErr(e error) string {
+	return `{"error":"` + e.Error() + `"}`
+}
+
+func fPrint(w io.Writer, a interface{}) {
+	fmt.Fprint(w, a)
+}
+
+func fPrintF(w io.Writer, content string, args ...interface{}) {
+	fmt.Fprintf(w, content, args...)
 }
