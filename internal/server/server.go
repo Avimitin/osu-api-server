@@ -71,5 +71,5 @@ func (osuSer *OsuServer) playerHandler(w http.ResponseWriter, r *http.Request) {
 
 func returnServerError(w http.ResponseWriter, err error) {
 	w.WriteHeader(http.StatusInternalServerError)
-	json.NewEncoder(w).Encode(fmtJsonErr(err))
+	json.NewEncoder(w).Encode(NewJsonMsg().Set("error", err.Error()))
 }

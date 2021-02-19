@@ -124,10 +124,19 @@ func hasPrefix(s string) (bool, string) {
 	return false, ""
 }
 
-type ErrMsg map[string]error
+type JsonMsg map[string]string
 
-func fmtJsonErr(e error) ErrMsg {
-	return ErrMsg{"error": e}
+func NewJsonMsg() JsonMsg {
+	return make(JsonMsg)
+}
+
+func (jm JsonMsg) Set(key string, content string) JsonMsg {
+	jm[key] = content
+	return jm
+}
+
+func fmtJsonMsg(key string, content string) JsonMsg {
+	return JsonMsg{key: content}
 }
 
 func fPrint(w io.Writer, a interface{}) {
