@@ -74,9 +74,7 @@ type OsuPlayerData struct {
 }
 
 func NewOsuPlayerData(db *database.OsuDB) *OsuPlayerData {
-	opd := new(OsuPlayerData)
-	opd.db = db
-	return opd
+	return &OsuPlayerData{db}
 }
 
 func (opd *OsuPlayerData) GetPlayerStat(name string) (string, error) {
