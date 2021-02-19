@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -15,30 +16,33 @@ type playerDataTest struct {
 	stat map[string]string
 }
 
-func (pdt *playerDataTest) GetPlayerStat(name string) (string, error) {
+func (pdt *playerDataTest) GetPlayerStat(name string) (*Player, error) {
+	if name == "" {
+		return nil, errors.New("null user input")
+	}
 	username, ok := pdt.stat[name]
 	if !ok {
-		return "", errors.New("user not found")
+		return nil, errors.New("user not found")
 	}
-	return fmt.Sprintf(`{"username": "%s"}`, username), nil
+	return &Player{Data: &api.User{Username: username}}, nil
 }
 
 func TestGetPlayer(t *testing.T) {
 	t.Run("Get avimitin score", func(t *testing.T) {
 		response := httptest.NewRecorder()
 		got := makeGetUserStatRequest("avimitin", response)
-		want := `{"username": "avimitin"}`
+		want := "avimitin"
 
-		assertSameString(t, got, want)
+		assertSameUser(t, got, want)
 		assertStatus(t, response.Code, http.StatusOK)
 	})
 
 	t.Run("Get coooool score", func(t *testing.T) {
 		response := httptest.NewRecorder()
 		got := makeGetUserStatRequest("coooool", response)
-		want := `{"username": "coooool"}`
+		want := "coooool"
 
-		assertSameString(t, got, want)
+		assertSameUser(t, got, want)
 		assertStatus(t, response.Code, http.StatusOK)
 	})
 
@@ -47,7 +51,7 @@ func TestGetPlayer(t *testing.T) {
 		response := httptest.NewRecorder()
 		ser := newSer()
 		ser.ServeHTTP(response, req)
-		assertSameString(t, response.Body.String(), `{"error":"user not found"}`)
+		assertErrMsg(t, response.Body.String(), "user not found")
 		assertStatus(t, response.Code, http.StatusInternalServerError)
 	})
 
@@ -56,7 +60,7 @@ func TestGetPlayer(t *testing.T) {
 		response := httptest.NewRecorder()
 		ser := newSer()
 		ser.ServeHTTP(response, req)
-		assertSameString(t, response.Body.String(), `{"error":"null user input"}`)
+		assertErrMsg(t, response.Body.String(), "null user input")
 		assertStatus(t, response.Code, http.StatusInternalServerError)
 	})
 }
@@ -146,9 +150,18 @@ func newSer() *OsuServer {
 	return NewOsuServer(pdt)
 }
 
-func assertSameString(t testing.TB, got, want string) {
+func assertSameUser(t testing.TB, got, want string) {
 	t.Helper()
-	if got != want {
+	var u *Player
+	err := json.Unmarshal([]byte(got), &u)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if u == nil || u.Data == nil {
+		t.Errorf("got %s want %s", got, want)
+		return
+	}
+	if u.Data.Username != want {
 		t.Errorf("got %s want %s", got, want)
 	}
 }
@@ -162,4 +175,23 @@ func TestPanicNewOsuServer(t *testing.T) {
 	}()
 
 	NewOsuServer(nil)
+}
+
+func assertErrMsg(t testing.TB, got, want string) {
+	t.Helper()
+
+	var err JsonMsg
+	e := json.Unmarshal([]byte(got), &err)
+	if e != nil {
+		t.Fatal(e)
+	}
+
+	if msg, ok := err["error"]; ok {
+		if msg != want {
+			t.Errorf("got %s want %s", got, want)
+		}
+		return
+	}
+
+	t.Errorf("error not exist")
 }
