@@ -53,7 +53,7 @@ func NewOsuServer(store PlayerData) *OsuServer {
 func (osuSer *OsuServer) playerHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	player := r.PostForm.Get("player")
-	log.Printf("%s:%s:%s", r.RemoteAddr, r.Method, player)
+	log.Printf("%s:%s:player:%s", r.RemoteAddr, r.Method, player)
 	if player == "" {
 		w.WriteHeader(http.StatusInternalServerError)
 		fPrint(w, fmtJsonErr(errors.New("null user input")))
