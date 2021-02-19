@@ -152,3 +152,14 @@ func assertSameString(t testing.TB, got, want string) {
 		t.Errorf("got %s want %s", got, want)
 	}
 }
+
+func TestPanicNewOsuServer(t *testing.T) {
+	defer func() {
+		err := recover()
+		if err != "nil data store" {
+			t.Errorf("recover a panic failed")
+		}
+	}()
+
+	NewOsuServer(nil)
+}
