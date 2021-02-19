@@ -73,6 +73,7 @@ type OsuPlayerData struct {
 	db *database.OsuDB
 }
 
+// NewOsuPlayerData return a database controller which satisfy PlayerData interface
 func NewOsuPlayerData(db *database.OsuDB) *OsuPlayerData {
 	return &OsuPlayerData{db}
 }
