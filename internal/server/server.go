@@ -6,9 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strings"
 
-	"github.com/avimitin/osu-api-server/internal/api"
 	"github.com/avimitin/osu-api-server/internal/config"
 	"github.com/avimitin/osu-api-server/internal/database"
 )
@@ -56,75 +54,20 @@ func (osuSer *OsuServer) playerHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("%s:%s:player:%s", r.RemoteAddr, r.Method, player)
 	if player == "" {
 		w.WriteHeader(http.StatusInternalServerError)
-		fPrint(w, fmtJsonErr(errors.New("null user input")))
+		json.NewEncoder(w).Encode(fmtJsonErr(errors.New("null user input")))
 		return
 	}
 	stat, err := osuSer.Data.GetPlayerStat(player)
 	if err != nil {
 		log.Printf("get %s data: %v", player, err)
 		w.WriteHeader(http.StatusInternalServerError)
-		fPrintF(w, fmtJsonErr(err))
+		json.NewEncoder(w).Encode(fmtJsonErr(err))
 		return
 	}
-	fPrint(w, stat)
-}
-
-type OsuPlayerData struct {
-	db *database.OsuDB
-}
-
-// NewOsuPlayerData return a database controller which satisfy PlayerData interface
-func NewOsuPlayerData(db *database.OsuDB) *OsuPlayerData {
-	return &OsuPlayerData{db}
-}
-
-func (opd *OsuPlayerData) GetPlayerStat(name string) (string, error) {
-	p, e := getPlayerDataByName(name, opd.db)
-	if e != nil {
-		return "", e
+	err = json.NewEncoder(w).Encode(stat)
+	if err != nil {
+		log.Printf("encode %v: %v", stat, err)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(fmtJsonErr(err))
 	}
-	data, e := json.Marshal(p)
-	if e != nil {
-		return "", e
-	}
-	return string(data), nil
-}
-
-func getPlayerDataByName(name string, db *database.OsuDB) (*Player, error) {
-	u, e := api.GetUsers(name)
-	if e != nil {
-		return nil, e
-	}
-	if len(u) <= 0 {
-		return nil, errors.New("user " + name + " not found")
-	}
-	user := u[0]
-	lu, e := db.GetUserRecent(user.Username)
-	if e != nil {
-		if strings.Contains(e.Error(), "user") {
-			e = db.InsertNewUser(
-				user.UserID, user.Username, user.Playcount, user.PpRank,
-				user.PpRaw, user.Accuracy, user.TotalSecondsPlayed,
-			)
-			if e != nil {
-				return nil, fmt.Errorf("insert user %s : %v", name, e)
-			}
-			log.Printf("inserted %s into database", user.Username)
-		} else {
-			return nil, fmt.Errorf("query user %s: %v", name, e)
-		}
-	}
-	var diff *Different
-	if lu != nil {
-		diff, e = getUserDiff(user, "recent", &lu.Date)
-	}
-	if e != nil {
-		return nil, e
-	}
-
-	p := &Player{
-		Data: u[0],
-		Diff: diff,
-	}
-	return p, nil
 }
