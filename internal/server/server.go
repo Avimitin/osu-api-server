@@ -54,14 +54,19 @@ func (osuSer *OsuServer) playerHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	player := r.PostForm.Get("player")
 	log.Printf("%s:%s:%s", r.RemoteAddr, r.Method, player)
+	if player == "" {
+		w.WriteHeader(http.StatusInternalServerError)
+		fPrint(w, fmtJsonErr(errors.New("null user input")))
+		return
+	}
 	stat, err := osuSer.Data.GetPlayerStat(player)
 	if err != nil {
 		log.Printf("get %s data: %v", player, err)
 		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, `{"error": "%s"}`, err.Error())
+		fPrintF(w, fmtJsonErr(err))
 		return
 	}
-	fmt.Fprint(w, stat)
+	fPrint(w, stat)
 }
 
 type OsuPlayerData struct {

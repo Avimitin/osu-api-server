@@ -47,7 +47,16 @@ func TestGetPlayer(t *testing.T) {
 		response := httptest.NewRecorder()
 		ser := newSer()
 		ser.ServeHTTP(response, req)
-		assertSameString(t, response.Body.String(), `{"error": "user not found"}`)
+		assertSameString(t, response.Body.String(), `{"error":"user not found"}`)
+		assertStatus(t, response.Code, http.StatusInternalServerError)
+	})
+
+	t.Run("nil input", func(t *testing.T) {
+		req := makeUserRequest("")
+		response := httptest.NewRecorder()
+		ser := newSer()
+		ser.ServeHTTP(response, req)
+		assertSameString(t, response.Body.String(), `{"error":"null user input"}`)
 		assertStatus(t, response.Code, http.StatusInternalServerError)
 	})
 }
