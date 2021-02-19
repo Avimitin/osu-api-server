@@ -3,7 +3,7 @@ package server
 import "github.com/avimitin/osu-api-server/internal/api"
 
 type PlayerData interface {
-	GetPlayerStat(name string) (string, error)
+	GetPlayerStat(name string) (*Player, error)
 }
 
 type Player struct {
