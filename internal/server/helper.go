@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -108,7 +109,7 @@ func getUserDiff(current *api.User, with string, local *database.Date) (*Differe
 
 func assertIsGetMethod(w http.ResponseWriter, r *http.Request) bool {
 	if r.Method != http.MethodGet {
-		fmt.Fprint(w, `{"error":"invalid method"}`)
+		json.NewEncoder(w).Encode(NewJsonMsg().Set("error", "invalid method"))
 		w.WriteHeader(http.StatusBadRequest)
 		return false
 	}
