@@ -44,14 +44,20 @@ func NewOsuServer(store PlayerData) *OsuServer {
 
 	router := http.NewServeMux()
 	router.Handle("/api/v1/player", http.HandlerFunc(os.playerHandler))
+	router.Handle("/api/v1/recent", http.HandlerFunc(os.playerRecentHandler))
 	os.Handler = router
 	return os
 }
 
-func (osuSer *OsuServer) playerHandler(w http.ResponseWriter, r *http.Request) {
+func getUserFromForm(w http.ResponseWriter, r *http.Request) string {
 	w.Header().Set("Content-Type", "application/json")
 	player := r.PostForm.Get("player")
 	log.Printf("%s:%s:player:%s", r.RemoteAddr, r.Method, player)
+	return player
+}
+
+func (osuSer *OsuServer) playerHandler(w http.ResponseWriter, r *http.Request) {
+	player := getUserFromForm(w, r)
 	if player == "" {
 		returnServerError(w, errors.New("null user input"))
 		return
@@ -66,6 +72,24 @@ func (osuSer *OsuServer) playerHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("encode %v: %v", stat, err)
 		returnServerError(w, err)
+	}
+}
+
+func (osuSer *OsuServer) playerRecentHandler(w http.ResponseWriter, r *http.Request) {
+	player := getUserFromForm(w, r)
+	if player == "" {
+		returnServerError(w, errors.New("no user specific"))
+		return
+	}
+	score, err := osuSer.Data.GetPlayerRecent(player)
+	if err != nil {
+		returnServerError(w, err)
+		return
+	}
+	err = json.NewEncoder(w).Encode(score)
+	if err != nil {
+		log.Printf("encode %v:%v", score, err)
+		returnServerError(w, fmt.Errorf("parse data failed %v", err))
 	}
 }
 
