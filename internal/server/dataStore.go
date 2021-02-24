@@ -23,6 +23,14 @@ func (opd *OsuPlayerData) GetPlayerStat(name string) (*Player, error) {
 	return getPlayerDataByName(name, opd.db)
 }
 
+func (opd *OsuPlayerData) GetPlayerRecent(name string) (*api.RecentPlay, error) {
+	scores, err := api.GetUserRecent(name, 1)
+	if err != nil {
+		return nil, fmt.Errorf("GetPlayerRecent: %v", err)
+	}
+	return scores[0], nil
+}
+
 func getPlayerDataByName(name string, db *database.OsuDB) (*Player, error) {
 	u, e := api.GetUsers(name)
 	if e != nil {
