@@ -23,13 +23,14 @@ var (
 	key string
 )
 
-func init() {
+// KeyInit designed to reusing init function
+func KeyInit() {
 	if key = os.Getenv("api_key"); key != "" {
 		return
 	}
 	conf, err := config.GetConfig()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("init query api: %v", err)
 	}
 	key = conf.Key
 }
