@@ -27,6 +27,19 @@ func (pdt *playerDataTest) GetPlayerStat(name string) (*Player, error) {
 	return &Player{Data: &api.User{Username: username}}, nil
 }
 
+func (pdt *playerDataTest) GetPlayerRecent(name string) (*api.RecentPlay, error) {
+	if name == "" {
+		return nil, errors.New("null input")
+	}
+	username, ok := pdt.stat[name]
+	if !ok {
+		return nil, errors.New("user not found")
+	}
+	return &api.RecentPlay{
+		UserID: username,
+	}, nil
+}
+
 func TestGetPlayer(t *testing.T) {
 	t.Run("Get avimitin score", func(t *testing.T) {
 		response := httptest.NewRecorder()
@@ -175,6 +188,25 @@ func TestPanicNewOsuServer(t *testing.T) {
 	}()
 
 	NewOsuServer(nil)
+}
+
+func TestGetUserRecent(t *testing.T) {
+	response := httptest.NewRecorder()
+	request, _ := http.NewRequest(http.MethodPost, "http://localhost:11451/api/v1/recent", nil)
+	request.ParseForm()
+	request.PostForm.Set("player", "avimitin")
+	ser := newSer()
+	ser.ServeHTTP(response, request)
+	var score *api.RecentPlay
+	err := json.Unmarshal(response.Body.Bytes(), &score)
+	if err != nil {
+		t.Fatalf("Unmarshal %s:%v", response.Body.String(), err)
+	}
+	got := score.UserID
+	want := "avimitin"
+	if got != want {
+		t.Errorf("got %s want %s", got, want)
+	}
 }
 
 func assertErrMsg(t testing.TB, got, want string) {
