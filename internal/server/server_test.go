@@ -27,7 +27,7 @@ func (pdt *playerDataTest) GetPlayerStat(name string) (*Player, error) {
 	return &Player{Data: &api.User{Username: username}}, nil
 }
 
-func (pdt *playerDataTest) GetPlayerRecent(name string) (*api.RecentPlay, error) {
+func (pdt *playerDataTest) GetRecent(name, mapID string, perf bool) (*api.RecentPlay, error) {
 	if name == "" {
 		return nil, errors.New("null input")
 	}
@@ -132,6 +132,43 @@ func TestCastFloat64(t *testing.T) {
 	}
 }
 
+func TestPanicNewOsuServer(t *testing.T) {
+	defer func() {
+		err := recover()
+		if err != "nil data store" {
+			t.Errorf("recover a panic failed")
+		}
+	}()
+
+	NewOsuServer(nil)
+}
+
+func TestGetUserRecent(t *testing.T) {
+	response := httptest.NewRecorder()
+	request, _ := http.NewRequest(http.MethodPost, "http://localhost:11451/api/v1/recent", nil)
+	request.ParseForm()
+	request.PostForm.Set("player", "avimitin")
+	ser := newSer()
+	ser.ServeHTTP(response, request)
+	var score *api.RecentPlay
+	err := json.Unmarshal(response.Body.Bytes(), &score)
+	if err != nil {
+		t.Fatalf("Unmarshal %s:%v", response.Body.String(), err)
+	}
+	got := score.UserID
+	want := "avimitin"
+	if got != want {
+		t.Errorf("got %s want %s", got, want)
+	}
+}
+
+func TestGetBeatMaps(t *testing.T) {
+	response := httptest.NewRecorder()
+	request, _ := http.NewRequest(http.MethodPost, "/api/v1/beatmaps", nil)
+	ser := newSer()
+	ser.ServeHTTP(response, request)
+}
+
 func assertStatus(t testing.TB, got, want int) {
 	t.Helper()
 	if got != want {
@@ -175,36 +212,6 @@ func assertSameUser(t testing.TB, got, want string) {
 		return
 	}
 	if u.Data.Username != want {
-		t.Errorf("got %s want %s", got, want)
-	}
-}
-
-func TestPanicNewOsuServer(t *testing.T) {
-	defer func() {
-		err := recover()
-		if err != "nil data store" {
-			t.Errorf("recover a panic failed")
-		}
-	}()
-
-	NewOsuServer(nil)
-}
-
-func TestGetUserRecent(t *testing.T) {
-	response := httptest.NewRecorder()
-	request, _ := http.NewRequest(http.MethodPost, "http://localhost:11451/api/v1/recent", nil)
-	request.ParseForm()
-	request.PostForm.Set("player", "avimitin")
-	ser := newSer()
-	ser.ServeHTTP(response, request)
-	var score *api.RecentPlay
-	err := json.Unmarshal(response.Body.Bytes(), &score)
-	if err != nil {
-		t.Fatalf("Unmarshal %s:%v", response.Body.String(), err)
-	}
-	got := score.UserID
-	want := "avimitin"
-	if got != want {
 		t.Errorf("got %s want %s", got, want)
 	}
 }
