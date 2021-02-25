@@ -147,3 +147,7 @@ func fPrint(w io.Writer, a interface{}) {
 func fPrintF(w io.Writer, content string, args ...interface{}) {
 	fmt.Fprintf(w, content, args...)
 }
+
+func setJsonHeader(w http.ResponseWriter) {
+	w.Header().Set("Content-Type", "application/json")
+}
