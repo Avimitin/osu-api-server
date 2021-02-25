@@ -45,6 +45,7 @@ func NewOsuServer(store OsuData) *OsuServer {
 	router := http.NewServeMux()
 	router.Handle("/api/v1/player", http.HandlerFunc(os.playerHandler))
 	router.Handle("/api/v1/recent", http.HandlerFunc(os.recentHandler))
+	router.Handle("/api/v1/beatmap", http.HandlerFunc(os.beatmapHandler))
 	os.Handler = router
 	return os
 }
