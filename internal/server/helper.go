@@ -140,14 +140,6 @@ func fmtJsonMsg(key string, content string) JsonMsg {
 	return JsonMsg{key: content}
 }
 
-func fPrint(w io.Writer, a interface{}) {
-	fmt.Fprint(w, a)
-}
-
-func fPrintF(w io.Writer, content string, args ...interface{}) {
-	fmt.Fprintf(w, content, args...)
-}
-
 func setJsonHeader(w http.ResponseWriter) {
 	w.Header().Set("Content-Type", "application/json")
 }
