@@ -83,6 +83,9 @@ func (osuSer *OsuServer) recentHandler(w http.ResponseWriter, r *http.Request) {
 		perf = true
 	}
 	mapID := getFormValue(r, "map")
+
+	log.Printf("recentHandler:[%s]:%s:%s", player, mapID, perfect)
+
 	score, err := osuSer.Data.GetRecent(player, mapID, perf)
 	if err != nil {
 		serErr(w, err)
