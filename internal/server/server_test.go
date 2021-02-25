@@ -40,6 +40,10 @@ func (pdt *playerDataTest) GetRecent(name, mapID string, perf bool) (*api.Recent
 	}, nil
 }
 
+func (pdt *playerDataTest) GetBeatMaps(setID, mapID string) (*api.Beatmap, error) {
+	return &api.Beatmap{BeatmapID: mapID}, nil
+}
+
 func TestGetPlayer(t *testing.T) {
 	t.Run("Get avimitin score", func(t *testing.T) {
 		response := httptest.NewRecorder()
@@ -164,9 +168,23 @@ func TestGetUserRecent(t *testing.T) {
 
 func TestGetBeatMaps(t *testing.T) {
 	response := httptest.NewRecorder()
-	request, _ := http.NewRequest(http.MethodPost, "/api/v1/beatmaps", nil)
+	request, _ := http.NewRequest(http.MethodPost, "/api/v1/beatmap", nil)
+	request.ParseForm()
+	request.PostForm.Set("map_id", "126645")
 	ser := newSer()
 	ser.ServeHTTP(response, request)
+	assertStatus(t, response.Code, http.StatusOK)
+	assertJsonHeader(t, response)
+	var bmaps *api.Beatmap
+	err := json.Unmarshal(response.Body.Bytes(), &bmaps)
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := bmaps.BeatmapID
+	want := "126645"
+	if got != want {
+		t.Errorf("got %s want %s", bmaps.BeatmapID, want)
+	}
 }
 
 func assertStatus(t testing.TB, got, want int) {
@@ -233,4 +251,17 @@ func assertErrMsg(t testing.TB, got, want string) {
 	}
 
 	t.Errorf("error not exist")
+}
+
+func assertJsonHeader(t testing.TB, resp http.ResponseWriter) {
+	t.Helper()
+	var ct string
+	if ct = resp.Header().Get("Content-Type"); ct != "" {
+		want := "application/json"
+		if ct != want {
+			t.Errorf("got %s want %s", ct, want)
+		}
+		return
+	}
+	t.Errorf("no content-type,get %s header:%+v", ct, resp.Header())
 }
