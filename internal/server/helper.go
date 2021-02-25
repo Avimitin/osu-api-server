@@ -125,18 +125,18 @@ func hasPrefix(s string) (bool, string) {
 	return false, ""
 }
 
-type JsonMsg map[string]string
+type JsonMsg map[string]interface{}
 
 func NewJsonMsg() JsonMsg {
 	return make(JsonMsg)
 }
 
-func (jm JsonMsg) Set(key string, content string) JsonMsg {
+func (jm JsonMsg) Set(key string, content interface{}) JsonMsg {
 	jm[key] = content
 	return jm
 }
 
-func fmtJsonMsg(key string, content string) JsonMsg {
+func fmtJsonMsg(key string, content interface{}) JsonMsg {
 	return JsonMsg{key: content}
 }
 
