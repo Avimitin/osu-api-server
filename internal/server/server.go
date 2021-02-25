@@ -49,15 +49,10 @@ func NewOsuServer(store PlayerData) *OsuServer {
 	return os
 }
 
-func getUserFromForm(w http.ResponseWriter, r *http.Request) string {
-	w.Header().Set("Content-Type", "application/json")
-	player := r.PostForm.Get("player")
-	log.Printf("%s:%s:player:%s", r.RemoteAddr, r.Method, player)
-	return player
-}
-
 func (osuSer *OsuServer) playerHandler(w http.ResponseWriter, r *http.Request) {
-	player := getUserFromForm(w, r)
+	setJsonHeader(w)
+	player := getFormValue(r, "player")
+	log.Printf("%s:%s:player:%s", r.RemoteAddr, r.Method, player)
 	if player == "" {
 		returnServerError(w, errors.New("null user input"))
 		return
