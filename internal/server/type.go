@@ -5,6 +5,7 @@ import "github.com/avimitin/osu-api-server/internal/api"
 type OsuData interface {
 	GetPlayerStat(name string) (*Player, error)
 	GetRecent(name, mapID string, perfect bool) (*api.RecentPlay, error)
+	GetBeatMaps(setID, mapID string) (*api.Beatmap, error)
 }
 
 type Player struct {
