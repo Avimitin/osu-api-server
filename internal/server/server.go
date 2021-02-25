@@ -44,7 +44,7 @@ func NewOsuServer(store PlayerData) *OsuServer {
 
 	router := http.NewServeMux()
 	router.Handle("/api/v1/player", http.HandlerFunc(os.playerHandler))
-	router.Handle("/api/v1/recent", http.HandlerFunc(os.playerRecentHandler))
+	router.Handle("/api/v1/recent", http.HandlerFunc(os.recentHandler))
 	os.Handler = router
 	return os
 }
@@ -70,7 +70,7 @@ func (osuSer *OsuServer) playerHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (osuSer *OsuServer) playerRecentHandler(w http.ResponseWriter, r *http.Request) {
+func (osuSer *OsuServer) recentHandler(w http.ResponseWriter, r *http.Request) {
 	setJsonHeader(w)
 	player := getFormValue(r, "player")
 	if player == "" {
