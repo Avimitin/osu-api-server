@@ -2,6 +2,10 @@ package api
 
 import "testing"
 
+func TestMain(t *testing.M) {
+	KeyInit()
+}
+
 func TestGetBeatMaps(t *testing.T) {
 	t.Run("get beatmap set", func(t *testing.T) {
 		maps, err := GetBeatMaps("983911", "")
