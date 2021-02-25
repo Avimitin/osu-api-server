@@ -30,12 +30,12 @@ func PrepareServer() (*OsuServer, error) {
 
 // OsuServer is a http handler and it store player data
 type OsuServer struct {
-	Data PlayerData
+	Data OsuData
 	http.Handler
 }
 
 // NewOsuServer return a OsuServer pointer
-func NewOsuServer(store PlayerData) *OsuServer {
+func NewOsuServer(store OsuData) *OsuServer {
 	if store == nil {
 		panic("nil data store")
 	}
