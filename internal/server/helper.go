@@ -151,3 +151,7 @@ func fPrintF(w io.Writer, content string, args ...interface{}) {
 func setJsonHeader(w http.ResponseWriter) {
 	w.Header().Set("Content-Type", "application/json")
 }
+
+func getFormValue(r *http.Request, key string) string {
+	return r.PostForm.Get(key)
+}
