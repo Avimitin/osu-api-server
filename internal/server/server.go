@@ -99,6 +99,22 @@ func (osuSer *OsuServer) recentHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (osuSer *OsuServer) beatmapHandler(w http.ResponseWriter, r *http.Request) {
+	setJsonHeader(w)
+	setID := getFormValue(r, "set_id")
+	mapID := getFormValue(r, "map_id")
+	bmap, err := osuSer.Data.GetBeatMaps(setID, mapID)
+	if err != nil {
+		serErr(w, err)
+		return
+	}
+	err = json.NewEncoder(w).Encode(bmap)
+	if err != nil {
+		log.Printf("unmarshal beatmap %s: %v", bmap, err)
+		serErr(w, fmt.Errorf("parse data failed %v", err))
+	}
+}
+
 func serErr(w http.ResponseWriter, err error) {
 	w.WriteHeader(http.StatusInternalServerError)
 	log.Println(err)
