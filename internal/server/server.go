@@ -77,7 +77,13 @@ func (osuSer *OsuServer) recentHandler(w http.ResponseWriter, r *http.Request) {
 		serErr(w, errors.New("no user specific"))
 		return
 	}
-	score, err := osuSer.Data.GetPlayerRecent(player)
+	perfect := getFormValue(r, "perfect")
+	var perf = false
+	if perfect == "true" {
+		perf = true
+	}
+	mapID := getFormValue(r, "map")
+	score, err := osuSer.Data.GetRecent(player, mapID, perf)
 	if err != nil {
 		serErr(w, err)
 		return
