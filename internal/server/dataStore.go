@@ -23,12 +23,47 @@ func (opd *OsuPlayerData) GetPlayerStat(name string) (*Player, error) {
 	return getPlayerDataByName(name, opd.db)
 }
 
-func (opd *OsuPlayerData) GetPlayerRecent(name string) (*api.RecentPlay, error) {
-	scores, err := api.GetUserRecent(name, 1)
+func (opd *OsuPlayerData) GetRecent(name, mapID string, perf bool) (*api.RecentPlay, error) {
+	if name == "" {
+		return nil, errors.New("invalid name input")
+	}
+	// if map id and perfect is not specific, return latest play
+	if mapID == "" && perf == false {
+		scores, err := api.GetUserRecent(name, 1)
+		if err != nil {
+			return nil, fmt.Errorf("GetPlayerRecent: %v", err)
+		}
+		return scores[0], nil
+	}
+	scores, err := api.GetUserRecent(name, 50)
 	if err != nil {
 		return nil, fmt.Errorf("GetPlayerRecent: %v", err)
 	}
-	return scores[0], nil
+	// got latest perfect play
+	if mapID == "" && perf == true {
+		for _, sc := range scores {
+			if sc.Perfect == "1" {
+				return sc, nil
+			}
+		}
+	}
+	// got specific beatmap
+	if perf == false {
+		for _, sc := range scores {
+			if sc.BeatmapID == mapID {
+				return sc, nil
+			}
+		}
+	}
+	// got specific beatmap and is perfect
+	if perf == true {
+		for _, sc := range scores {
+			if sc.BeatmapID == mapID && sc.Perfect == "1" {
+				return sc, nil
+			}
+		}
+	}
+	return nil, fmt.Errorf("target not found")
 }
 
 func getPlayerDataByName(name string, db *database.OsuDB) (*Player, error) {
