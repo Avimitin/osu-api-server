@@ -66,6 +66,10 @@ func (opd *OsuPlayerData) GetRecent(name, mapID string, perf bool) (*api.RecentP
 	return nil, fmt.Errorf("target not found")
 }
 
+func (*OsuPlayerData) GetBeatMaps(setID, mapID string) (*api.Beatmap, error) {
+	return nil, nil
+}
+
 func getPlayerDataByName(name string, db *database.OsuDB) (*Player, error) {
 	u, e := api.GetUsers(name)
 	if e != nil {
