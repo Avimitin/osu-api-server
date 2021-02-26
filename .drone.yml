@@ -16,7 +16,7 @@ trigger:
 
 services:
   - name: database
-    image: mariadb
+    image: mariadb:10
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
       MYSQL_DATABASE: osu_test
