@@ -5,7 +5,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"io/ioutil"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -63,24 +66,47 @@ func (rds *RedisDataStore) CheckHealth() error {
 	return nil
 }
 
-// GetPlayer get a user recent score by specific given name
-func (rds *RedisDataStore) GetPlayer(name string) (*User, error) {
+func (rds *RedisDataStore) getStr(key string) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
-	val, err := rds.db.Get(ctx, name).Result()
+	val, err := rds.db.Get(ctx, key).Result()
 	switch {
 	case err == redis.Nil:
-		return nil, errors.New("user not found")
+		return "", fmt.Errorf("%q not found", key)
 	case err != nil:
-		return nil, fmt.Errorf("get %q failed: %v", name, err)
+		return "", fmt.Errorf("get %q failed: %v", key, err)
 	case val == "":
-		return nil, errors.New("get nil value")
+		return "", errors.New("get nil value")
 	}
+	return val, nil
+}
 
-	var u *User
-	err = json.Unmarshal([]byte(val), &u)
+func (rds *RedisDataStore) parseUser(data io.Reader) (*User, error) {
+	jsonbyte, err := ioutil.ReadAll(data)
 	if err != nil {
-		return nil, fmt.Errorf("parse %q: %v", val, err)
+		return nil, fmt.Errorf("parseUser: read data: %v", err)
+	}
+	var u *User
+	err = json.Unmarshal(jsonbyte, &u)
+	if err != nil {
+		return nil, fmt.Errorf("parse %q: %v", jsonbyte, err)
 	}
 	return u, nil
+}
+
+// GetPlayer get a user recent score by specific given name
+func (rds *RedisDataStore) GetPlayer(name string) (*User, error) {
+	val, err := rds.getStr(name + ":recent")
+	if err != nil {
+		return nil, err
+	}
+	return rds.parseUser(strings.NewReader(val))
+}
+
+func (rds *RedisDataStore) GetPlayerOld(name string) (*User, error) {
+	val, err := rds.getStr(name)
+	if err != nil {
+		return nil, err
+	}
+	return rds.parseUser(strings.NewReader(val))
 }
