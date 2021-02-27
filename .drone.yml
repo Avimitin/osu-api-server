@@ -24,7 +24,7 @@ services:
       MYSQL_PASSWORD: osu_test
 
 steps:
-  - name: server_test
+  - name: unit_test
     image: golang:1.15
     environment:
       api_key:
@@ -33,11 +33,17 @@ steps:
       database_host: "database:3306"
     commands:
       - "go get ./..."
-      - "echo 'waiting for mariadb setting up'"
+      - "go test -v -cover ./internal"
+
+  - name: intergration_test
+    image: golang:1.15
+    environment:
+      osuapi_project_root: "/go/src/github.com/avimitin/osuapi"
+      database_host: "database:3306"
+    commands:
+      - "echo wait for database"
       - "sleep 15"
-      - "go build -ldflags '-w -s' -o bin/oas_linux_amd64 cmd/cmd.go"
-      - "go test -v ./..."
+      - "go test -v ./intergration"
     when:
       branch:
         - master
-
