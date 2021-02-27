@@ -23,6 +23,9 @@ services:
       MYSQL_USER: osu_test
       MYSQL_PASSWORD: osu_test
 
+  - name: redis
+    image: redis
+
 steps:
   - name: unit_test
     image: golang:1.15
@@ -35,15 +38,18 @@ steps:
       - "go get ./..."
       - "go test -v -cover ./internal/..."
 
-  - name: intergration_test
+  - name: mysql_test
     image: golang:1.15
-    environment:
-      osuapi_project_root: "/go/src/github.com/avimitin/osuapi"
-      database_host: "database:3306"
     commands:
-      - "echo wait for database"
-      - "sleep 15"
-      - "go test -v ./intergration"
+      - "./intergration/scripts/mysql_test.sh"
+    when:
+      branch:
+        - master
+
+  - name: redis_test
+    image: golang:1.15
+    commands:
+      - "./intergration/scripts/redis_test.sh"
     when:
       branch:
         - master
