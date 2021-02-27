@@ -55,20 +55,11 @@ func prepareTestDatabase(t testing.TB) {
 	}
 }
 
-func TestMain(m *testing.M) {
-	var err error
-
-	err = InitTestfixtures(filepath.Join(projectPath, "intergration/fixtures"))
+func init() {
+	err := InitTestfixtures(filepath.Join(projectPath, "intergration/fixtures"))
 	if err != nil {
 		fatalF("init test fixtures: %v", err)
 	}
-
-	os.Exit(m.Run())
-}
-
-func fatalF(context string, args ...interface{}) {
-	fmt.Printf(context, args...)
-	os.Exit(1)
 }
 
 func TestGetPlayer(t *testing.T) {
