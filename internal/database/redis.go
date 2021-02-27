@@ -28,7 +28,7 @@ func NewRedisDataStore() *RedisDataStore {
 	rds := new(RedisDataStore)
 
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     getEnvWithFallBack("redis_host", "localhost:6479"),
+		Addr:     getEnvWithFallBack("redis_host", "localhost:6379"),
 		Password: "",
 		DB:       0,
 	})
