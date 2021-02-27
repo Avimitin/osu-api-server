@@ -30,3 +30,19 @@ func NewRedisDataStore() *RedisDataStore {
 	rds.db = rdb
 	return rds
 }
+
+// AddPlayer add given user into redis database.
+// With given user's username as key and it's json
+// bytes as value.
+func (rds *RedisDataStore) AddPlayer(u User) error {
+	jsonByte, err := json.Marshal(u)
+	if err != nil {
+		return fmt.Errorf("marshal %v:%s", u.Username, err)
+	}
+	ctx := context.Background()
+	sc := rds.db.Set(ctx, u.Username, jsonByte, 0)
+	if sc.Err() != nil {
+		return fmt.Errorf("set %s into redis: %v", u.Username, sc.Err())
+	}
+	return nil
+}
