@@ -17,6 +17,8 @@ func getEnvWithFallBack(key, fallback string) string {
 	return fallback
 }
 
+// NewRedisDataStore return a initialized PlayerDataStore
+// with redis implement
 func NewRedisDataStore() *RedisDataStore {
 	rds := new(RedisDataStore)
 
