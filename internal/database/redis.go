@@ -66,6 +66,28 @@ func (rds *RedisDataStore) CheckHealth() error {
 	return nil
 }
 
+func (rds *RedisDataStore) getPlayerWithDate(name string, date string) (*User, error) {
+	val, err := rds.getStr(parseSchema(name, date))
+	if err != nil {
+		return nil, err
+	}
+	return rds.parseUser(strings.NewReader(val))
+}
+
+// GetPlayer get a user recent score by specific given name
+func (rds *RedisDataStore) GetPlayer(name string) (*User, error) {
+	return rds.getPlayerWithDate(name, "recent")
+}
+
+// GetPlayerOld get a user old score by specific given name
+func (rds *RedisDataStore) GetPlayerOld(name string) (*User, error) {
+	return rds.getPlayerWithDate(name, "old")
+}
+
+func parseSchema(key string, args ...string) string {
+	return key + ":" + strings.Join(args, ":")
+}
+
 func (rds *RedisDataStore) getStr(key string) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
@@ -92,21 +114,4 @@ func (rds *RedisDataStore) parseUser(data io.Reader) (*User, error) {
 		return nil, fmt.Errorf("parse %q: %v", jsonbyte, err)
 	}
 	return u, nil
-}
-
-// GetPlayer get a user recent score by specific given name
-func (rds *RedisDataStore) GetPlayer(name string) (*User, error) {
-	val, err := rds.getStr(name + ":recent")
-	if err != nil {
-		return nil, err
-	}
-	return rds.parseUser(strings.NewReader(val))
-}
-
-func (rds *RedisDataStore) GetPlayerOld(name string) (*User, error) {
-	val, err := rds.getStr(name)
-	if err != nil {
-		return nil, err
-	}
-	return rds.parseUser(strings.NewReader(val))
 }
