@@ -1,16 +1,19 @@
-package database
+package intergration
 
 import (
+	"database/sql"
 	"fmt"
 	"os"
 	"strings"
 	"testing"
 
+	"github.com/avimitin/osu-api-server/internal/database"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/go-testfixtures/testfixtures/v3"
 )
 
 var (
-	db          *MySQLDataStore
+	db          *database.MySQLDataStore
 	fixtures    *testfixtures.Loader
 	projectPath = os.Getenv("osuapi_project_root")
 )
@@ -24,7 +27,7 @@ func InitTestfixtures(dir string) error {
 		dsn = fmt.Sprintf(dsn, "localhost:3306")
 	}
 
-	db, err = NewMySQLStore(dsn)
+	db, err = database.NewMySQLStore(dsn)
 	if err != nil {
 		return fmt.Errorf("connect to database: %v", err)
 	}
@@ -32,8 +35,12 @@ func InitTestfixtures(dir string) error {
 	if err != nil {
 		return fmt.Errorf("check health: %v", err)
 	}
+	test_db, err := sql.Open("mysql", dsn)
+	if err != nil {
+		return fmt.Errorf("prepare test database: %v", err)
+	}
 	fixtures, err = testfixtures.New(
-		testfixtures.Database(db.db),
+		testfixtures.Database(test_db),
 		testfixtures.Dialect("mysql"),
 		testfixtures.Directory(dir),
 	)
@@ -104,7 +111,7 @@ func TestGetPlayerOldData(t *testing.T) {
 
 func assertSameUser(t testing.TB, date string, want string) bool {
 	t.Helper()
-	var u *User
+	var u *database.User
 	var err error
 	switch date {
 	case "recent":
