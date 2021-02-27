@@ -52,6 +52,7 @@ func (rds *RedisDataStore) AddPlayer(u User) error {
 	return nil
 }
 
+// CheckHealth checking connection
 func (rds *RedisDataStore) CheckHealth() error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
@@ -62,6 +63,7 @@ func (rds *RedisDataStore) CheckHealth() error {
 	return nil
 }
 
+// GetPlayer get a user recent score by specific given name
 func (rds *RedisDataStore) GetPlayer(name string) (*User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
