@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -57,7 +58,7 @@ func prepareTestDatabase(t testing.TB) {
 func TestMain(m *testing.M) {
 	var err error
 
-	err = InitTestfixtures(projectPath + "/internal/database/fixtures/")
+	err = InitTestfixtures(filepath.Join(projectPath, "intergration/fixtures"))
 	if err != nil {
 		fatalF("init test fixtures: %v", err)
 	}
