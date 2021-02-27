@@ -33,7 +33,7 @@ steps:
       database_host: "database:3306"
     commands:
       - "go get ./..."
-      - "go test -v -cover ./internal"
+      - "go test -v -cover ./internal/..."
 
   - name: intergration_test
     image: golang:1.15
