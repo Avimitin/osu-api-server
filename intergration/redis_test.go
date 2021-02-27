@@ -47,7 +47,7 @@ func TestAddPlayer(t *testing.T) {
 		t.Errorf("add new user: %v", err)
 	}
 
-	got, err := rdb.GetPlayer("test")
+	got, err := rdb.GetPlayer("test:recent")
 
 	if err != nil {
 		t.Errorf("get user: %v", err)

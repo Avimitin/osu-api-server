@@ -45,7 +45,7 @@ func (rds *RedisDataStore) AddPlayer(u User) error {
 		return fmt.Errorf("marshal %v:%s", u.Username, err)
 	}
 	ctx := context.Background()
-	sc := rds.db.Set(ctx, u.Username, jsonByte, 0)
+	sc := rds.db.Set(ctx, u.Username+":recent", jsonByte, 0)
 	if sc.Err() != nil {
 		return fmt.Errorf("set %s into redis: %v", u.Username, sc.Err())
 	}
