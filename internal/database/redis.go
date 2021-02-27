@@ -46,3 +46,13 @@ func (rds *RedisDataStore) AddPlayer(u User) error {
 	}
 	return nil
 }
+
+func (rds *RedisDataStore) CheckHealth() error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
+	defer cancel()
+	sc := rds.db.Ping(ctx)
+	if e := sc.Err(); e != nil {
+		return fmt.Errorf("checkhealth: ping to %v: %v", "redis server", e)
+	}
+	return nil
+}
