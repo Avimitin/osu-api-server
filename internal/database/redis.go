@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"time"
@@ -59,4 +60,25 @@ func (rds *RedisDataStore) CheckHealth() error {
 		return fmt.Errorf("checkhealth: ping to %v: %v", "redis server", e)
 	}
 	return nil
+}
+
+func (rds *RedisDataStore) GetPlayer(name string) (*User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
+	defer cancel()
+	val, err := rds.db.Get(ctx, name).Result()
+	switch {
+	case err == redis.Nil:
+		return nil, errors.New("user not found")
+	case err != nil:
+		return nil, fmt.Errorf("get %q failed: %v", name, err)
+	case val == "":
+		return nil, errors.New("get nil value")
+	}
+
+	var u *User
+	err = json.Unmarshal([]byte(val), &u)
+	if err != nil {
+		return nil, fmt.Errorf("parse %q: %v", val, err)
+	}
+	return u, nil
 }
