@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
+	"strings"
 	"testing"
 
 	"github.com/avimitin/osu-api-server/internal/api"
@@ -149,9 +151,11 @@ func TestPanicNewOsuServer(t *testing.T) {
 
 func TestGetUserRecent(t *testing.T) {
 	response := httptest.NewRecorder()
-	request, _ := http.NewRequest(http.MethodPost, "http://localhost:11451/api/v1/recent", nil)
-	request.ParseForm()
-	request.PostForm.Set("player", "avimitin")
+	form := url.Values{"player": {"avimitin"}}
+	request, _ := http.NewRequest(
+		http.MethodPost, "http://localhost:11451/api/v1/recent", strings.NewReader(form.Encode()),
+	)
+	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	ser := newSer()
 	ser.ServeHTTP(response, request)
 	var score *api.RecentPlay
@@ -195,9 +199,11 @@ func assertStatus(t testing.TB, got, want int) {
 }
 
 func makeUserRequest(username string) (request *http.Request) {
-	request, _ = http.NewRequest(http.MethodPost, "http://example.com/api/v1/player", nil)
-	request.ParseForm()
-	request.PostForm.Add("player", username)
+	form := url.Values{"player": {username}}
+	request, _ = http.NewRequest(
+		http.MethodPost, "http://example.com/api/v1/player", strings.NewReader(form.Encode()),
+	)
+	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	return request
 }
 
