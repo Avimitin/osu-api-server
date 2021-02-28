@@ -20,7 +20,7 @@ func getEnvWithFallBack(key, fallback string) string {
 }
 
 func prepareRedisDB() error {
-	rdb = database.NewRedisDataStore(getEnvWithFallBack("redis_dsn", "redis://localhost:6379"))
+	rdb = database.NewRedisDataStore(getEnvWithFallBack("redis_dsn", "redis://:@localhost:6379/"))
 	if err := rdb.CheckHealth(); err != nil {
 		return err
 	}
