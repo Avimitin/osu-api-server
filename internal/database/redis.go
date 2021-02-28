@@ -47,13 +47,7 @@ func (rds *RedisDataStore) AddPlayer(u User) error {
 	if err != nil {
 		return fmt.Errorf("marshal %v:%s", u.Username, err)
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*1)
-	defer cancel()
-	sc := rds.db.Set(ctx, u.Username+":recent", jsonByte, 0)
-	if sc.Err() != nil {
-		return fmt.Errorf("set %s into redis: %v", u.Username, sc.Err())
-	}
-	return nil
+	return rds.set(parseSchema(u.Username, "recent"), jsonByte)
 }
 
 // CheckHealth checking connection
@@ -84,13 +78,17 @@ func (rds *RedisDataStore) Update(u User) error {
 
 	jsonData, err := json.Marshal(u)
 	if err != nil {
-		return fmt.Errorf("update: parse user %q data: %v", u.Username, err)
+		return fmt.Errorf("parse user %q data: %v", u.Username, err)
 	}
+	return rds.set(parseSchema(u.Username, "recent"), jsonData)
+}
+
+func (rds *RedisDataStore) set(key string, val interface{}) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
-	cmd := rds.db.Set(ctx, parseSchema(u.Username, "recent"), jsonData, 0)
+	cmd := rds.db.Set(ctx, key, val, 0)
 	if cmd.Err() != nil {
-		return fmt.Errorf("update: set player %q: %v", u.Username, cmd.Err())
+		return fmt.Errorf("set %q: %v", key, cmd.Err())
 	}
 	return nil
 }
