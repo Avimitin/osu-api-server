@@ -11,6 +11,11 @@ import (
 	"github.com/avimitin/osu-api-server/internal/database"
 )
 
+var (
+	serverErr    = errors.New("unexpected server error")
+	nullInputErr = errors.New("invalid null input")
+)
+
 // PrepareServer initialized all the service
 func PrepareServer() (*OsuServer, error) {
 	cfg, err := config.GetConfig()
@@ -55,19 +60,19 @@ func (osuSer *OsuServer) playerHandler(w http.ResponseWriter, r *http.Request) {
 	player := getFormValue(r, "player")
 	log.Printf("%q:%q:player:%q", r.RemoteAddr, r.Method, player)
 	if player == "" {
-		serErr(w, errors.New("null user input"))
+		serErr(w, nullInputErr)
 		return
 	}
 	stat, err := osuSer.Data.GetPlayerStat(player)
 	if err != nil {
 		log.Printf("get %q data: %v", player, err)
-		serErr(w, err)
+		serErr(w, serverErr)
 		return
 	}
 	err = json.NewEncoder(w).Encode(stat)
 	if err != nil {
 		log.Printf("encode %v: %v", stat, err)
-		serErr(w, err)
+		serErr(w, serverErr)
 	}
 }
 
@@ -75,7 +80,7 @@ func (osuSer *OsuServer) recentHandler(w http.ResponseWriter, r *http.Request) {
 	setJsonHeader(w)
 	player := getFormValue(r, "player")
 	if player == "" {
-		serErr(w, errors.New("no user specific"))
+		serErr(w, nullInputErr)
 		return
 	}
 	perfect := getFormValue(r, "perfect")
@@ -89,13 +94,14 @@ func (osuSer *OsuServer) recentHandler(w http.ResponseWriter, r *http.Request) {
 
 	score, err := osuSer.Data.GetRecent(player, mapID, perf)
 	if err != nil {
-		serErr(w, err)
+		log.Printf("get recent data:%v", err)
+		serErr(w, serverErr)
 		return
 	}
 	err = json.NewEncoder(w).Encode(score)
 	if err != nil {
 		log.Printf("encode %v:%v", score, err)
-		serErr(w, fmt.Errorf("parse data failed %v", err))
+		serErr(w, serverErr)
 	}
 }
 
@@ -105,13 +111,14 @@ func (osuSer *OsuServer) beatmapHandler(w http.ResponseWriter, r *http.Request) 
 	mapID := getFormValue(r, "map_id")
 	bmap, err := osuSer.Data.GetBeatMaps(setID, mapID)
 	if err != nil {
-		serErr(w, err)
+		log.Printf("get beatmap : %v", err)
+		serErr(w, serverErr)
 		return
 	}
 	err = json.NewEncoder(w).Encode(bmap)
 	if err != nil {
 		log.Printf("unmarshal beatmap %q: %v", bmap, err)
-		serErr(w, fmt.Errorf("parse data failed %v", err))
+		serErr(w, serverErr)
 	}
 }
 
