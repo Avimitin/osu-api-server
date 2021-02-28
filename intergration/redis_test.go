@@ -72,4 +72,27 @@ func TestRedis(t *testing.T) {
 	if !reflect.DeepEqual(&want, got) {
 		t.Errorf("updated: got %+v \nwant %+v", got, want)
 	}
+
+	want.Date.Recent = database.Data{}
+	want.Date.Yesterday = database.Data{
+		PlayCount: "0",
+		Rank:      "1",
+		PP:        "2",
+		Acc:       "3",
+		PlayTime:  "4",
+	}
+
+	err = rdb.UpdateOld(want)
+	if err != nil {
+		t.Fatalf("update old: %v", err)
+	}
+
+	got, err = rdb.GetPlayerOld("test")
+	if err != nil {
+		t.Fatalf("get user: %v", err)
+	}
+
+	if !reflect.DeepEqual(&want, got) {
+		t.Errorf("updated: got %+v \nwant %+v", got, want)
+	}
 }

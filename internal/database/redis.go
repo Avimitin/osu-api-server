@@ -83,6 +83,15 @@ func (rds *RedisDataStore) Update(u User) error {
 	return rds.set(parseSchema(u.Username, "recent"), jsonData)
 }
 
+func (rds *RedisDataStore) UpdateOld(u User) error {
+	jsonData, err := json.Marshal(u)
+	if err != nil {
+		return fmt.Errorf("parse user %q : %v", u.Username, err)
+	}
+
+	return rds.set(parseSchema(u.Username, "old"), jsonData)
+}
+
 func (rds *RedisDataStore) set(key string, val interface{}) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
