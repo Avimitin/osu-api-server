@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
 	"strings"
 	"time"
@@ -26,15 +27,23 @@ func getEnvWithFallBack(key, fallback string) string {
 }
 
 // NewRedisDataStore return a initialized PlayerDataStore
-// with redis implement
-func NewRedisDataStore() *RedisDataStore {
+// with redis implement. dsn should be format like this:
+// redis://<user>:<password>@<host>:<port>/<db_number>
+// else will get panic
+func NewRedisDataStore(dsn string) *RedisDataStore {
 	rds := new(RedisDataStore)
+	opt, err := redis.ParseURL(dsn)
+	if err != nil {
+		panic(fmt.Sprintf("parse %s: %v", dsn, err))
+	}
+	defer func() {
+		if e := recover(); e != nil {
+			log.Println(e)
+			os.Exit(1)
+		}
+	}()
 
-	rdb := redis.NewClient(&redis.Options{
-		Addr:     getEnvWithFallBack("redis_host", "localhost:6379"),
-		Password: "",
-		DB:       0,
-	})
+	rdb := redis.NewClient(opt)
 	rds.db = rdb
 	return rds
 }
