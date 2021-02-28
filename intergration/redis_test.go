@@ -44,17 +44,32 @@ func TestRedis(t *testing.T) {
 	var err error
 	err = rdb.AddPlayer(want)
 	if err != nil {
-		t.Errorf("add new user: %v", err)
+		t.Fatalf("add new user: %v", err)
 	}
 
 	got, err := rdb.GetPlayer("test")
 
 	if err != nil {
-		t.Errorf("get user: %v", err)
+		t.Fatalf("get user: %v", err)
 	}
 
 	if !reflect.DeepEqual(&want, got) {
 		t.Errorf("got %+v \nwant %+v", got, want)
 	}
 
+	want.Date.Recent.PlayCount = "20"
+	want.Date.Recent.Rank = "21"
+	err = rdb.Update(want)
+	if err != nil {
+		t.Fatalf("update: %v", err)
+	}
+
+	got, err = rdb.GetPlayer("test")
+	if err != nil {
+		t.Fatalf("get user: %v", err)
+	}
+
+	if !reflect.DeepEqual(&want, got) {
+		t.Errorf("updated: got %+v \nwant %+v", got, want)
+	}
 }
