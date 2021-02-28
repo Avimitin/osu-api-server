@@ -17,3 +17,7 @@ type DatabaseSecret struct {
 func (dbs DatabaseSecret) EncodeDSN() string {
 	return fmt.Sprintf("%s:%s@tcp(%s)/osu?charset=utf8mb4", dbs.Username, dbs.Password, dbs.Host)
 }
+
+func (dbs DatabaseSecret) EncodeRedisDSN() string {
+	return fmt.Sprintf("redis://%s:%s@%s", dbs.Username, dbs.Password, dbs.Host)
+}
