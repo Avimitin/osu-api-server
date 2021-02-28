@@ -31,7 +31,7 @@ func Connect(driver string, dsn string) (*OsuDB, error) {
 		}
 		return &OsuDB{store}, nil
 	case "redis":
-		store := NewRedisDataStore()
+		store := NewRedisDataStore(dsn)
 		return &OsuDB{store}, nil
 	}
 	return nil, errors.New("unsupport database driver")
