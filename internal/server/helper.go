@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"regexp"
 	"strconv"
 
 	"github.com/avimitin/osu-api-server/internal/api"
