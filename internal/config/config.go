@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	pa "path"
 )
 
 // GetConfig search config at
@@ -14,11 +15,11 @@ import (
 // return error if no env set
 func GetConfig() (*Configuration, error) {
 	if path := os.Getenv("osu_conf_path"); path != "" {
-		return getConfigFromPath(path + "/config.json")
+		return getConfigFromPath(pa.Join(path, "config.json"))
 	}
 
 	if path := os.Getenv("HOME"); path != "" {
-		return getConfigFromPath(path + "/.config/osuapi/config.json")
+		return getConfigFromPath(pa.Join(path, ".config", "osuapi", "config.json"))
 	}
 	return nil, errors.New("not variable set")
 }
