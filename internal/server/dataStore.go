@@ -88,7 +88,7 @@ func getPlayerDataByName(name string, db *database.OsuDB) (*Player, error) {
 	user := u[0]
 	lu, e := db.GetUserRecent(user.Username)
 	if e != nil {
-		if strings.Contains(e.Error(), "user") {
+		if strings.Contains(e.Error(), "not found") {
 			e = db.InsertNewUser(
 				user.UserID, user.Username, user.Playcount, user.PpRank,
 				user.PpRaw, user.Accuracy, user.TotalSecondsPlayed,
