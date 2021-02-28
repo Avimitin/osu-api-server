@@ -52,7 +52,7 @@ func (rds *RedisDataStore) AddPlayer(u User) error {
 
 // CheckHealth checking connection
 func (rds *RedisDataStore) CheckHealth() error {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*1)
 	defer cancel()
 	sc := rds.db.Ping(ctx)
 	if e := sc.Err(); e != nil {
