@@ -78,12 +78,8 @@ func (rds *RedisDataStore) GetPlayerOld(name string) (*User, error) {
 }
 
 func (rds *RedisDataStore) Update(u User) error {
-	user, err := rds.GetPlayer(u.Username)
-	if err != nil {
-		return fmt.Errorf("update: get player %q: %v", u.Username, err)
-	}
-	if user == nil {
-		return errors.New("user not found")
+	if !rds.isUserExist(u.Username) {
+		return errors.New("user to update not found")
 	}
 
 	jsonData, err := json.Marshal(u)
