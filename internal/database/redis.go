@@ -44,6 +44,7 @@ func NewRedisDataStore(dsn string) *RedisDataStore {
 	}()
 
 	rdb := redis.NewClient(opt)
+	log.Printf("redis connecting to %s", opt.Addr)
 	rds.db = rdb
 	return rds
 }
