@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/avimitin/osu-api-server/internal/api"
 	"github.com/avimitin/osu-api-server/internal/config"
 	"github.com/avimitin/osu-api-server/internal/database"
 )
@@ -22,6 +23,7 @@ func PrepareServer() (*OsuServer, error) {
 	if err != nil {
 		return nil, fmt.Errorf("server prepare config: %v", err)
 	}
+	api.KeyInit()
 	db, err := database.Connect("redis", cfg.DBSec.EncodeRedisDSN())
 	if err != nil {
 		return nil, fmt.Errorf("connect to %s:%v", cfg.DBSec.EncodeRedisDSN(), err)
