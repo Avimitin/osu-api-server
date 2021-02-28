@@ -17,7 +17,7 @@ func PrepareServer() (*OsuServer, error) {
 	if err != nil {
 		return nil, fmt.Errorf("server prepare config: %v", err)
 	}
-	db, err := database.Connect("mysql", cfg.DBSec.EncodeDSN())
+	db, err := database.Connect("redis", cfg.DBSec.EncodeDSN())
 	if err != nil {
 		return nil, fmt.Errorf("connect to %s:%v", cfg.DBSec.EncodeDSN(), err)
 	}
