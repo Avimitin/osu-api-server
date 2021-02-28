@@ -53,14 +53,14 @@ func NewOsuServer(store OsuData) *OsuServer {
 func (osuSer *OsuServer) playerHandler(w http.ResponseWriter, r *http.Request) {
 	setJsonHeader(w)
 	player := getFormValue(r, "player")
-	log.Printf("%s:%s:player:%s", r.RemoteAddr, r.Method, player)
+	log.Printf("%q:%q:player:%q", r.RemoteAddr, r.Method, player)
 	if player == "" {
 		serErr(w, errors.New("null user input"))
 		return
 	}
 	stat, err := osuSer.Data.GetPlayerStat(player)
 	if err != nil {
-		log.Printf("get %s data: %v", player, err)
+		log.Printf("get %q data: %v", player, err)
 		serErr(w, err)
 		return
 	}
@@ -85,7 +85,7 @@ func (osuSer *OsuServer) recentHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	mapID := getFormValue(r, "map")
 
-	log.Printf("GET [%s]:%s:%s", player, mapID, perfect)
+	log.Printf("GET [%q]:%q:%q", player, mapID, perfect)
 
 	score, err := osuSer.Data.GetRecent(player, mapID, perf)
 	if err != nil {
@@ -110,7 +110,7 @@ func (osuSer *OsuServer) beatmapHandler(w http.ResponseWriter, r *http.Request) 
 	}
 	err = json.NewEncoder(w).Encode(bmap)
 	if err != nil {
-		log.Printf("unmarshal beatmap %s: %v", bmap, err)
+		log.Printf("unmarshal beatmap %q: %v", bmap, err)
 		serErr(w, fmt.Errorf("parse data failed %v", err))
 	}
 }
