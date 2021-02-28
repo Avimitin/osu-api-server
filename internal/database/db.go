@@ -13,11 +13,9 @@ type OsuDB struct {
 
 // Connect return database connection by given DSN
 func Connect(driver string, dsn string) (*OsuDB, error) {
-	var store *MySQLDataStore
-	var err error
 	switch driver {
 	case "mysql":
-		store, err = NewMySQLStore(dsn)
+		store, err := NewMySQLStore(dsn)
 		if err != nil {
 			return nil, fmt.Errorf("connect %s:%v", dsn, err)
 		}
@@ -31,11 +29,12 @@ func Connect(driver string, dsn string) (*OsuDB, error) {
 		if err != nil {
 			return nil, fmt.Errorf("connect db: %v", err)
 		}
-	default:
-		return nil, errors.New("unsupport database driver")
+		return &OsuDB{store}, nil
+	case "redis":
+		store := NewRedisDataStore()
+		return &OsuDB{store}, nil
 	}
-
-	return &OsuDB{store}, nil
+	return nil, errors.New("unsupport database driver")
 }
 
 func (db *OsuDB) CheckUserDataStoreHealth() error {
