@@ -99,6 +99,17 @@ func (rds *RedisDataStore) Update(u User) error {
 	return nil
 }
 
+func (rds *RedisDataStore) isUserExist(name string) bool {
+	user, err := rds.GetPlayer(name)
+	if err != nil {
+		return false
+	}
+	if user == nil {
+		return false
+	}
+	return true
+}
+
 func parseSchema(key string, args ...string) string {
 	return key + ":" + strings.Join(args, ":")
 }
