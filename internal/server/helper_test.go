@@ -1,25 +1,18 @@
 package server
 
-import "testing"
+import (
+	"net/http"
+	"net/url"
+	"strings"
+	"testing"
+)
 
-func TestHasPrefix(t *testing.T) {
-	t.Run("test exist", func(t *testing.T) {
-		test := "/api/v1/players/avimitin"
-		ok, got := hasPrefix(test)
-		if !ok {
-			t.Errorf("%s don't match", test)
-		}
-		want := "players"
-		if got != want {
-			t.Errorf("Got %s want %s", got, want)
-		}
-	})
-
-	t.Run("test invalid", func(t *testing.T) {
-		test := "/api/players/avimitin"
-		ok, _ := hasPrefix(test)
-		if ok {
-			t.Errorf("unexpected match")
-		}
-	})
+func TestGetFormValue(t *testing.T) {
+	form := url.Values{"key": {"val"}}
+	req, _ := http.NewRequest("POST", "/test", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	val := getFormValue(req, "key")
+	if val != "val" {
+		t.Errorf("got %s want val", val)
+	}
 }
