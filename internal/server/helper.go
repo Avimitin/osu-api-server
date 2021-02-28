@@ -134,5 +134,6 @@ func setJsonHeader(w http.ResponseWriter) {
 }
 
 func getFormValue(r *http.Request, key string) string {
+	r.ParseForm()
 	return r.PostForm.Get(key)
 }
