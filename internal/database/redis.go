@@ -76,6 +76,28 @@ func (rds *RedisDataStore) GetPlayerOld(name string) (*User, error) {
 	return rds.getPlayerWithDate(name, "old")
 }
 
+func (rds *RedisDataStore) Update(u User) error {
+	user, err := rds.GetPlayer(u.Username)
+	if err != nil {
+		return fmt.Errorf("update: get player %q: %v", u.Username, err)
+	}
+	if user == nil {
+		return errors.New("user not found")
+	}
+
+	jsonData, err := json.Marshal(u)
+	if err != nil {
+		return fmt.Errorf("update: parse user %q data: %v", u.Username, err)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+	cmd := rds.db.Set(ctx, parseSchema(u.Username, "recent"), jsonData, 0)
+	if cmd.Err() != nil {
+		return fmt.Errorf("update: set player %q: %v", u.Username, cmd.Err())
+	}
+	return nil
+}
+
 func parseSchema(key string, args ...string) string {
 	return key + ":" + strings.Join(args, ":")
 }
