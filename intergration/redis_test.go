@@ -26,7 +26,7 @@ func init() {
 	}
 }
 
-func TestAddPlayer(t *testing.T) {
+func TestRedis(t *testing.T) {
 	want := database.User{
 		UserID:   "1",
 		Username: "test",
