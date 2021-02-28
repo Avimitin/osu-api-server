@@ -60,7 +60,9 @@ func NewOsuServer(store OsuData) *OsuServer {
 func (osuSer *OsuServer) playerHandler(w http.ResponseWriter, r *http.Request) {
 	setJsonHeader(w)
 	player := getFormValue(r, "player")
-	log.Printf("%q:%q:player:%q", r.RemoteAddr, r.Method, player)
+
+	log.Printf("%q:%s:player:%q", r.RemoteAddr, r.Method, player)
+
 	if player == "" {
 		serErr(w, nullInputErr)
 		return
@@ -92,7 +94,7 @@ func (osuSer *OsuServer) recentHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	mapID := getFormValue(r, "map")
 
-	log.Printf("GET [%q]:%q:%q", player, mapID, perfect)
+	log.Printf("%q %s [%q]:%q:%q", r.RemoteAddr, r.Method, player, mapID, perfect)
 
 	score, err := osuSer.Data.GetRecent(player, mapID, perf)
 	if err != nil {
@@ -111,6 +113,9 @@ func (osuSer *OsuServer) beatmapHandler(w http.ResponseWriter, r *http.Request) 
 	setJsonHeader(w)
 	setID := getFormValue(r, "set_id")
 	mapID := getFormValue(r, "map_id")
+
+	log.Printf("%q %s beatmap [%q|%q]", r.RemoteAddr, r.Method, setID, mapID)
+
 	bmap, err := osuSer.Data.GetBeatMaps(setID, mapID)
 	if err != nil {
 		log.Printf("get beatmap : %v", err)
