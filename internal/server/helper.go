@@ -115,15 +115,6 @@ func assertIsGetMethod(w http.ResponseWriter, r *http.Request) bool {
 	return true
 }
 
-func hasPrefix(s string) (bool, string) {
-	reg := regexp.MustCompile(`^/api/v1/(\w+)/`)
-	matches := reg.FindStringSubmatch(s)
-	if len(matches) == 2 {
-		return true, matches[1]
-	}
-	return false, ""
-}
-
 type JsonMsg map[string]interface{}
 
 func NewJsonMsg() JsonMsg {
