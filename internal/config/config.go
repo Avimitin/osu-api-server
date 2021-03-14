@@ -32,7 +32,7 @@ func getConfigFromPath(path string) (*Configuration, error) {
 	var cfg *Configuration
 	err = json.Unmarshal(file, &cfg)
 	if err != nil {
-		return nil, fmt.Errorf("marshal %s: %v", file, err)
+		return nil, fmt.Errorf("json decode %s: %v", file, err)
 	}
 	return cfg, nil
 }
