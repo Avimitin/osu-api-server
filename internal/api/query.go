@@ -5,14 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"strconv"
 	"strings"
-
-	"github.com/avimitin/osu-api-server/internal/config"
 )
 
 const (
@@ -24,15 +21,11 @@ var (
 )
 
 // KeyInit designed to reusing init function
-func KeyInit() {
+func KeyInit(k string) {
 	if key = os.Getenv("api_key"); key != "" {
 		return
 	}
-	conf, err := config.GetConfig()
-	if err != nil {
-		log.Fatalf("init query api: %v", err)
-	}
-	key = conf.Key
+	key = k
 }
 
 // GetBeatMaps return list of beatmap by specific beatmap set ID
