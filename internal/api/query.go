@@ -32,36 +32,32 @@ func KeyInit(k string) {
 // or specific beatmap id. Should notice that if beatmap set and
 // beatmap id is both given, beatmap id is foremore.
 func GetBeatMaps(setID string, mapID string) ([]*Beatmap, error) {
+	var requestData = make(map[string]string)
+	requestData["k"] = key
+
 	// if beatmap_id is specific, request it first
+	var hasSet bool
 	if mapID != "" {
-		body, err := request(
-			buildURL("get_beatmaps",
-				map[string]string{
-					"k": key,
-					"b": mapID,
-				}),
-		)
-		if err != nil {
-			return nil, err
-		}
-		return unmarshallBeatMaps(body)
+		requestData["b"] = mapID
+		mapHasSet(&hasSet)
+	}
+	if !hasSet && setID != "" {
+		requestData["s"] = setID
+		mapHasSet(&hasSet)
+	}
+	if !hasSet {
+		return nil, errors.New("invalid query parameters")
 	}
 
-	if setID != "" {
-		body, err := request(
-			buildURL("get_beatmaps",
-				map[string]string{
-					"k": key,
-					"b": mapID,
-				}),
-		)
-		if err != nil {
-			return nil, err
-		}
-		return unmarshallBeatMaps(body)
+	body, err := request(buildURL("get_beatmaps", requestData))
+	if err != nil {
+		return nil, err
 	}
+	return unmarshallBeatMaps(body)
+}
 
-	return nil, errors.New("invalid query parameters")
+func mapHasSet(val *bool) {
+	*val = true
 }
 
 func unmarshallBeatMaps(body []byte) ([]*Beatmap, error) {
