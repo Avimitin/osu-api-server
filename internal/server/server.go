@@ -132,5 +132,8 @@ func (osuSer *OsuServer) beatmapHandler(w http.ResponseWriter, r *http.Request) 
 func serErr(w http.ResponseWriter, err error) {
 	w.WriteHeader(http.StatusInternalServerError)
 	log.Println(err)
-	json.NewEncoder(w).Encode(NewJsonMsg().Set("error", err.Error()))
+	e := json.NewEncoder(w).Encode(NewJsonMsg().Set("error", err.Error()))
+	if e != nil {
+		log.Printf("encoding error msg: %v", err)
+	}
 }
