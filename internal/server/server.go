@@ -19,14 +19,18 @@ var (
 
 // PrepareServer initialized all the service
 func PrepareServer() (*OsuServer, error) {
+	// load user setting
 	cfg, err := config.GetConfig()
 	if err != nil {
 		return nil, fmt.Errorf("server prepare config: %v", err)
 	}
+	// initialize query key
 	api.KeyInit(cfg.Key)
-	db, err := database.Connect("redis", cfg.DatabaseSettings.EncodeRedisDSN())
+	// initialize database connection
+	dsn := cfg.DatabaseSettings.EncodeRedisDSN()
+	db, err := database.Connect("redis", dsn)
 	if err != nil {
-		return nil, fmt.Errorf("connect to %s:%v", cfg.DatabaseSettings.EncodeRedisDSN(), err)
+		return nil, fmt.Errorf("connect to %s:%v", dsn, err)
 	}
 	if err = db.CheckUserDataStoreHealth(); err != nil {
 		return nil, fmt.Errorf("check database health:%v", err)
