@@ -1,3 +1,9 @@
 {
-	"key": "hash"
+	"key": "hash",
+	"db_type": "redis",
+	"database_settings": {
+		"username": "root",
+		"password": "",
+		"host": "localhost"
+	}
 }
