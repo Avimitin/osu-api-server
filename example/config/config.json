@@ -3,7 +3,7 @@
 	"db_type": "redis",
 	"database_settings": {
 		"username": "root",
-		"password": "",
+		"password": "example",
 		"host": "localhost"
 	}
 }
