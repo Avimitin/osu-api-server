@@ -24,9 +24,9 @@ func PrepareServer() (*OsuServer, error) {
 		return nil, fmt.Errorf("server prepare config: %v", err)
 	}
 	api.KeyInit()
-	db, err := database.Connect("redis", cfg.DBSec.EncodeRedisDSN())
+	db, err := database.Connect("redis", cfg.DatabaseSettings.EncodeRedisDSN())
 	if err != nil {
-		return nil, fmt.Errorf("connect to %s:%v", cfg.DBSec.EncodeRedisDSN(), err)
+		return nil, fmt.Errorf("connect to %s:%v", cfg.DatabaseSettings.EncodeRedisDSN(), err)
 	}
 	if err = db.CheckUserDataStoreHealth(); err != nil {
 		return nil, fmt.Errorf("check database health:%v", err)
