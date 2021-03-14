@@ -21,7 +21,7 @@ func GetConfig() (*Configuration, error) {
 	if path := os.Getenv("HOME"); path != "" {
 		return getConfigFromPath(pa.Join(path, ".config", "osuapi", "config.json"))
 	}
-	return nil, errors.New("not variable set")
+	return nil, errors.New("no variable set")
 }
 
 func getConfigFromPath(path string) (*Configuration, error) {
