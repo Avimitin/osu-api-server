@@ -118,23 +118,8 @@ func TestCastFloat64(t *testing.T) {
 	if err != nil {
 		t.Fatalf("cast 3426.48 got %v", err)
 	}
-	j, err := parseFloat("4000.50")
-	if err != nil {
-		t.Fatalf("cast 4000.5 got %v", err)
-	}
 	if i != 3426.48 {
 		t.Errorf("want 3426.48 got %f", i)
-	}
-	if j != 4000.50 {
-		t.Errorf("want 4000.5 got %f", j)
-	}
-
-	if i-j != -574.02 {
-		t.Errorf("expect %f got %f", -574.02, i-j)
-	}
-
-	if fmt.Sprintf("%.3f", i-j) != "-574.020" {
-		t.Errorf("expect %s got %s", "-574.020", fmt.Sprintf("%.3f", i-j))
 	}
 }
 
