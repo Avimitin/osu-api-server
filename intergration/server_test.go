@@ -7,11 +7,11 @@ import (
 )
 
 func TestPrepareServer(t *testing.T) {
-	server, err := server.PrepareServer()
+	TestServer, err := server.PrepareServer()
 	if err != nil {
 		t.Fatal(err)
 	}
-	if server == nil {
+	if TestServer == nil {
 		t.Errorf("got nil server")
 	}
 }
