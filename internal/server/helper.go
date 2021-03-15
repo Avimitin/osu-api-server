@@ -126,10 +126,6 @@ func (jm JsonMsg) Set(key string, content interface{}) JsonMsg {
 	return jm
 }
 
-func fmtJsonMsg(key string, content interface{}) JsonMsg {
-	return JsonMsg{key: content}
-}
-
 func setJsonHeader(w http.ResponseWriter) {
 	w.Header().Set("Content-Type", "application/json")
 }
