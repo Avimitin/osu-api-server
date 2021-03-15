@@ -30,13 +30,14 @@ func PrepareServer() (*OsuServer, error) {
 		return nil, err
 	}
 	// initialize database connection
-	dsn := cfg.DatabaseSettings.EncodeRedisDSN()
-	db, err := database.Connect("redis", dsn)
+	dsn := cfg.DatabaseSettings.EncodeDSN(cfg.DBType)
+	db, err := database.Connect(cfg.DBType, dsn)
 	if err != nil {
-		return nil, fmt.Errorf("connect to %s:%v", dsn, err)
+		return nil, fmt.Errorf("connect to %s at %s:%v", cfg.DBType, dsn, err)
 	}
+	// check database connection
 	if err = db.CheckUserDataStoreHealth(); err != nil {
-		return nil, fmt.Errorf("check database health:%v", err)
+		return nil, fmt.Errorf("check %s health:%v", cfg.DBType, err)
 	}
 	opd := NewOsuPlayerData(db)
 	return NewOsuServer(opd), nil

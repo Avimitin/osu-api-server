@@ -15,10 +15,13 @@ type DatabaseSettings struct {
 }
 
 // EncodeDSN return links to osu database
-func (dbs DatabaseSettings) EncodeDSN() string {
-	return fmt.Sprintf("%s:%s@tcp(%s)/osu?charset=utf8mb4", dbs.Username, dbs.Password, dbs.Host)
-}
-
-func (dbs DatabaseSettings) EncodeRedisDSN() string {
-	return fmt.Sprintf("redis://%s:%s@%s", dbs.Username, dbs.Password, dbs.Host)
+func (dbs DatabaseSettings) EncodeDSN(dbType string) string {
+	switch dbType {
+	case "mysql":
+		return fmt.Sprintf("%s:%s@tcp(%s)/osu?charset=utf8mb4", dbs.Username, dbs.Password, dbs.Host)
+	case "redis":
+		return fmt.Sprintf("redis://%s:%s@%s", dbs.Username, dbs.Password, dbs.Host)
+	default:
+		return ""
+	}
 }
