@@ -70,28 +70,28 @@ func (osuSer *OsuServer) playerHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("%q:%s:player:%q", r.RemoteAddr, r.Method, player)
 
-	if player == "" {
-		serErr(w, nullInputErr)
+	if isNullString(player) {
+		responseServerError(w, nullInputErr)
 		return
 	}
 	stat, err := osuSer.Data.GetPlayerStat(player)
 	if err != nil {
 		log.Printf("get %q data: %v", player, err)
-		serErr(w, serverErr)
+		responseServerError(w, serverErr)
 		return
 	}
 	err = json.NewEncoder(w).Encode(stat)
 	if err != nil {
 		log.Printf("encode %v: %v", stat, err)
-		serErr(w, serverErr)
+		responseServerError(w, serverErr)
 	}
 }
 
 func (osuSer *OsuServer) recentHandler(w http.ResponseWriter, r *http.Request) {
 	setJsonHeader(w)
 	player := getFormValue(r, "player")
-	if player == "" {
-		serErr(w, nullInputErr)
+	if isNullString(player) {
+		responseServerError(w, nullInputErr)
 		return
 	}
 	perfect := getFormValue(r, "perfect")
@@ -106,13 +106,13 @@ func (osuSer *OsuServer) recentHandler(w http.ResponseWriter, r *http.Request) {
 	score, err := osuSer.Data.GetRecent(player, mapID, perf)
 	if err != nil {
 		log.Printf("get recent data:%v", err)
-		serErr(w, serverErr)
+		responseServerError(w, serverErr)
 		return
 	}
 	err = json.NewEncoder(w).Encode(score)
 	if err != nil {
 		log.Printf("encode %v:%v", score, err)
-		serErr(w, serverErr)
+		responseServerError(w, serverErr)
 	}
 }
 
@@ -126,17 +126,17 @@ func (osuSer *OsuServer) beatmapHandler(w http.ResponseWriter, r *http.Request) 
 	bmap, err := osuSer.Data.GetBeatMaps(setID, mapID)
 	if err != nil {
 		log.Printf("get beatmap : %v", err)
-		serErr(w, serverErr)
+		responseServerError(w, serverErr)
 		return
 	}
 	err = json.NewEncoder(w).Encode(bmap)
 	if err != nil {
 		log.Printf("unmarshal beatmap %q: %v", bmap, err)
-		serErr(w, serverErr)
+		responseServerError(w, serverErr)
 	}
 }
 
-func serErr(w http.ResponseWriter, err error) {
+func responseServerError(w http.ResponseWriter, err error) {
 	w.WriteHeader(http.StatusInternalServerError)
 	log.Println(err)
 	e := json.NewEncoder(w).Encode(NewJsonMsg().Set("error", err.Error()))
