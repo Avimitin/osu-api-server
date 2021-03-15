@@ -65,7 +65,7 @@ func NewOsuServer(store OsuData) *OsuServer {
 }
 
 func (osuSer *OsuServer) playerHandler(w http.ResponseWriter, r *http.Request) {
-	if !assertIsGetMethod(w, r) {
+	if !isWantedMethod(w, r, http.MethodPost) {
 		return
 	}
 	setJsonHeader(w)
@@ -91,7 +91,7 @@ func (osuSer *OsuServer) playerHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (osuSer *OsuServer) recentHandler(w http.ResponseWriter, r *http.Request) {
-	if !assertIsGetMethod(w, r) {
+	if !isWantedMethod(w, r, http.MethodPost) {
 		return
 	}
 
@@ -128,7 +128,7 @@ func (osuSer *OsuServer) recentHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (osuSer *OsuServer) beatmapHandler(w http.ResponseWriter, r *http.Request) {
-	if !assertIsGetMethod(w, r) {
+	if !isWantedMethod(w, r, http.MethodPost) {
 		return
 	}
 
