@@ -65,6 +65,9 @@ func NewOsuServer(store OsuData) *OsuServer {
 }
 
 func (osuSer *OsuServer) playerHandler(w http.ResponseWriter, r *http.Request) {
+	if !assertIsGetMethod(w, r) {
+		return
+	}
 	setJsonHeader(w)
 	player := getFormValue(r, "player")
 
@@ -88,20 +91,27 @@ func (osuSer *OsuServer) playerHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (osuSer *OsuServer) recentHandler(w http.ResponseWriter, r *http.Request) {
+	if !assertIsGetMethod(w, r) {
+		return
+	}
+
 	setJsonHeader(w)
+
 	player := getFormValue(r, "player")
 	if isNullString(player) {
 		responseServerError(w, nullInputErr)
 		return
 	}
+
 	perfect := getFormValue(r, "perfect")
 	var perf = false
 	if perfect == "true" {
 		perf = true
 	}
+
 	mapID := getFormValue(r, "map")
 
-	log.Printf("%q %s [%q]:%q:%q", r.RemoteAddr, r.Method, player, mapID, perfect)
+	log.Printf("%q %s player %q recent map:%q perfect:%q", r.RemoteAddr, r.Method, player, mapID, perfect)
 
 	score, err := osuSer.Data.GetRecent(player, mapID, perf)
 	if err != nil {
@@ -109,6 +119,7 @@ func (osuSer *OsuServer) recentHandler(w http.ResponseWriter, r *http.Request) {
 		responseServerError(w, serverErr)
 		return
 	}
+
 	err = json.NewEncoder(w).Encode(score)
 	if err != nil {
 		log.Printf("encode %v:%v", score, err)
@@ -117,11 +128,16 @@ func (osuSer *OsuServer) recentHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (osuSer *OsuServer) beatmapHandler(w http.ResponseWriter, r *http.Request) {
+	if !assertIsGetMethod(w, r) {
+		return
+	}
+
 	setJsonHeader(w)
+
 	setID := getFormValue(r, "set_id")
 	mapID := getFormValue(r, "map_id")
 
-	log.Printf("%q %s beatmap [%q|%q]", r.RemoteAddr, r.Method, setID, mapID)
+	log.Printf("%q %s beatmap [set:%q|bmap:%q]", r.RemoteAddr, r.Method, setID, mapID)
 
 	bmap, err := osuSer.Data.GetBeatMaps(setID, mapID)
 	if err != nil {
