@@ -105,8 +105,9 @@ func getUserDiff(current *api.User, with string, local *database.Date) (*Differe
 	}, nil
 }
 
-func assertIsGetMethod(w http.ResponseWriter, r *http.Request) bool {
-	if r.Method != http.MethodGet {
+func isWantedMethod(w http.ResponseWriter, r *http.Request, method string) bool {
+	if r.Method != method {
+		setJsonHeader(w)
 		json.NewEncoder(w).Encode(NewJsonMsg().Set("error", "invalid method"))
 		w.WriteHeader(http.StatusBadRequest)
 		return false
