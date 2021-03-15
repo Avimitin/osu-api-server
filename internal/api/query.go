@@ -21,11 +21,14 @@ var (
 )
 
 // KeyInit designed to reusing init function
-func KeyInit(k string) {
+func KeyInit(k string) error {
 	if key = os.Getenv("api_key"); key != "" {
-		return
+		return nil
 	}
-	key = k
+	if k != "" {
+		key = k
+	}
+	return errors.New("no api key found")
 }
 
 // GetBeatMaps return list of beatmap by specific beatmap set ID

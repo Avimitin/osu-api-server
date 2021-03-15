@@ -25,7 +25,10 @@ func PrepareServer() (*OsuServer, error) {
 		return nil, fmt.Errorf("server prepare config: %v", err)
 	}
 	// initialize query key
-	api.KeyInit(cfg.Key)
+	err = api.KeyInit(cfg.Key)
+	if err != nil {
+		return nil, err
+	}
 	// initialize database connection
 	dsn := cfg.DatabaseSettings.EncodeRedisDSN()
 	db, err := database.Connect("redis", dsn)
