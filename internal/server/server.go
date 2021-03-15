@@ -39,8 +39,7 @@ func PrepareServer() (*OsuServer, error) {
 	if err = db.CheckUserDataStoreHealth(); err != nil {
 		return nil, fmt.Errorf("check %s health:%v", cfg.DBType, err)
 	}
-	opd := NewOsuPlayerData(db)
-	return NewOsuServer(opd), nil
+	return NewOsuServer(NewOsuPlayerData(db)), nil
 }
 
 // OsuServer is a http handler and it store player data
