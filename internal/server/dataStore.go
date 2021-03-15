@@ -10,6 +10,7 @@ import (
 	"github.com/avimitin/osu-api-server/internal/database"
 )
 
+// OsuPlayerData store database connection
 type OsuPlayerData struct {
 	db *database.OsuDB
 }
@@ -30,8 +31,13 @@ func (opd *OsuPlayerData) GetRecent(name, mapID string, perf bool) (*api.RecentP
 	// if map id and perfect is not specific, return latest play
 	if mapID == "" && perf == false {
 		scores, err := api.GetUserRecent(name, 1)
+
 		if err != nil {
 			return nil, fmt.Errorf("GetPlayerRecent: %v", err)
+		}
+
+		if len(scores) < 1 {
+			return nil, errors.New("user not found")
 		}
 		return scores[0], nil
 	}
@@ -39,24 +45,21 @@ func (opd *OsuPlayerData) GetRecent(name, mapID string, perf bool) (*api.RecentP
 	if err != nil {
 		return nil, fmt.Errorf("GetPlayerRecent: %v", err)
 	}
-	// got latest perfect play
-	if mapID == "" && perf == true {
+
+	switch {
+	case mapID == "" && perf == true:
 		for _, sc := range scores {
 			if sc.Perfect == "1" {
 				return sc, nil
 			}
 		}
-	}
-	// got specific beatmap
-	if perf == false {
+	case perf == false:
 		for _, sc := range scores {
 			if sc.BeatmapID == mapID {
 				return sc, nil
 			}
 		}
-	}
-	// got specific beatmap and is perfect
-	if perf == true {
+	case perf == true:
 		for _, sc := range scores {
 			if sc.BeatmapID == mapID && sc.Perfect == "1" {
 				return sc, nil
