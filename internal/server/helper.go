@@ -137,3 +137,7 @@ func getFormValue(r *http.Request, key string) string {
 	r.ParseForm()
 	return r.PostForm.Get(key)
 }
+
+func isNullString(input string) bool {
+	return input == ""
+}
