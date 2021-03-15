@@ -53,15 +53,7 @@ func TestGetPlayer(t *testing.T) {
 
 		assertSameUser(t, got, want)
 		assertStatus(t, response.Code, http.StatusOK)
-	})
-
-	t.Run("Get coooool score", func(t *testing.T) {
-		response := httptest.NewRecorder()
-		got := makeGetUserStatRequest("coooool", response)
-		want := "coooool"
-
-		assertSameUser(t, got, want)
-		assertStatus(t, response.Code, http.StatusOK)
+		assertJsonHeader(t, response)
 	})
 
 	t.Run("Get error", func(t *testing.T) {
@@ -156,9 +148,12 @@ func TestGetUserRecent(t *testing.T) {
 
 func TestGetBeatMaps(t *testing.T) {
 	response := httptest.NewRecorder()
-	request, _ := http.NewRequest(http.MethodPost, "/api/v1/beatmap", nil)
-	request.ParseForm()
-	request.PostForm.Set("map_id", "126645")
+	form := url.Values{"map_id": {"126645"}}
+	request, _ := http.NewRequest(
+		http.MethodPost,
+		"/api/v1/beatmap",
+		strings.NewReader(form.Encode()),
+	)
 	ser := newSer()
 	ser.ServeHTTP(response, request)
 	assertStatus(t, response.Code, http.StatusOK)
@@ -185,7 +180,9 @@ func assertStatus(t testing.TB, got, want int) {
 func makeUserRequest(username string) (request *http.Request) {
 	form := url.Values{"player": {username}}
 	request, _ = http.NewRequest(
-		http.MethodPost, "http://example.com/api/v1/player", strings.NewReader(form.Encode()),
+		http.MethodPost,
+		"http://example.com/api/v1/player",
+		strings.NewReader(form.Encode()),
 	)
 	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	return request
