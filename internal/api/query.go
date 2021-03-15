@@ -38,17 +38,12 @@ func GetBeatMaps(setID string, mapID string) ([]*Beatmap, error) {
 	var requestData = make(map[string]string)
 	requestData["k"] = key
 
-	// if beatmap_id is specific, request it first
-	var hasSet bool
-	if mapID != "" {
+	switch {
+	case mapID != "":
 		requestData["b"] = mapID
-		mapHasSet(&hasSet)
-	}
-	if !hasSet && setID != "" {
+	case setID != "":
 		requestData["s"] = setID
-		mapHasSet(&hasSet)
-	}
-	if !hasSet {
+	default:
 		return nil, errors.New("invalid query parameters")
 	}
 
@@ -57,10 +52,6 @@ func GetBeatMaps(setID string, mapID string) ([]*Beatmap, error) {
 		return nil, err
 	}
 	return unmarshallBeatMaps(body)
-}
-
-func mapHasSet(val *bool) {
-	*val = true
 }
 
 func unmarshallBeatMaps(body []byte) ([]*Beatmap, error) {
