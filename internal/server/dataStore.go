@@ -112,9 +112,8 @@ func getPlayerDataByName(name string, db *database.OsuDB) (*Player, error) {
 		return nil, e
 	}
 
-	p := &Player{
-		Data: u[0],
+	return &Player{
+		Data: user,
 		Diff: diff,
-	}
-	return p, nil
+	}, nil
 }
