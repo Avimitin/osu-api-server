@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-//OsuDB contain sql.DB field
+//OsuDB store user local data
 type OsuDB struct {
 	UsersData PlayerDataStore
 }
