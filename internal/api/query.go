@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"os"
 	"strconv"
 	"strings"
 )
@@ -22,9 +21,6 @@ var (
 
 // KeyInit designed to reusing init function
 func KeyInit(k string) error {
-	if key = os.Getenv("api_key"); key != "" {
-		return nil
-	}
 	if k != "" {
 		key = k
 	}
