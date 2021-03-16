@@ -36,3 +36,17 @@ func getConfigFromPath(path string) (*Configuration, error) {
 	}
 	return cfg, nil
 }
+
+// SaveConfig store configuration to as config.json to
+// given path
+func SaveConfig(where string, cfg *Configuration) error {
+	var data, err = json.Marshal(&cfg)
+	if err != nil {
+		return fmt.Errorf("json encode config: %v", err)
+	}
+	err = ioutil.WriteFile(path.Join(where, "config.json"), data, 0644)
+	if err != nil {
+		return fmt.Errorf("write config to %s: %v", where, err)
+	}
+	return nil
+}
