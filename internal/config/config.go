@@ -21,23 +21,26 @@ func GetConfig() (*Configuration, error) {
 		var cfg *Configuration
 		var err error
 		cfg, err = getConfigFromPath(path.Join(confPath, "config.json"))
-		if err != nil {
-			switch {
-			case errorHas(err, "no such file or directory"):
-			case errorHas(err, "The system cannot find the file specified"):
-				cfg, err = getConfigFromEnv()
-				if err != nil {
-					return nil, err
-				}
-				err = SaveConfig(confPath, cfg)
-				if err != nil {
-					return nil, fmt.Errorf("writing config: %v", err)
-				}
-				return cfg, nil
-			}
-			return nil, err
+		if err == nil {
+			return cfg, nil
 		}
-		return cfg, nil
+
+		// if error is about file not found, get those fields from env
+		switch {
+		case errorHas(err, "no such file or directory"):
+		case errorHas(err, "The system cannot find the file specified"):
+			cfg, err = getConfigFromEnv()
+			if err != nil {
+				return nil, err
+			}
+			err = SaveConfig(confPath, cfg)
+			if err != nil {
+				return nil, fmt.Errorf("writing config: %v", err)
+			}
+			return cfg, nil
+		}
+
+		return nil, err
 	}
 
 	if confPath := os.Getenv("HOME"); confPath != "" {
