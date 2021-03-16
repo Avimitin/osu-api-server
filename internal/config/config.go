@@ -6,22 +6,75 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	pa "path"
+	"path"
+	"strings"
 )
 
 // GetConfig search config at
-// $HOME/.config/osuapi/config.json
-// or $osu_conf_path/config.json.
-// return error if no env set
+// $HOME/.config/osuapi/config.json or
+// $OSU_CONF_PATH/config.json.
+// If $OSU_CONF_PATH is specific, and no file found at the
+// given path, program will try to read config field at
+// environment variable. return error if no env set.
 func GetConfig() (*Configuration, error) {
-	if path := os.Getenv("osu_conf_path"); path != "" {
-		return getConfigFromPath(pa.Join(path, "config.json"))
+	if confPath := os.Getenv("OSU_CONF_PATH"); confPath != "" {
+		var cfg *Configuration
+		var err error
+		cfg, err = getConfigFromPath(path.Join(confPath, "config.json"))
+		if err != nil {
+			switch {
+			case errorHas(err, "no such file or directory"):
+			case errorHas(err, "The system cannot find the file specified"):
+				cfg, err = getConfigFromEnv()
+				if err != nil {
+					return nil, err
+				}
+				err = SaveConfig(confPath, cfg)
+				if err != nil {
+					return nil, fmt.Errorf("writing config: %v", err)
+				}
+				return cfg, nil
+			}
+			return nil, err
+		}
+		return cfg, nil
 	}
 
-	if path := os.Getenv("HOME"); path != "" {
-		return getConfigFromPath(pa.Join(path, ".config", "osuapi", "config.json"))
+	if confPath := os.Getenv("HOME"); confPath != "" {
+		return getConfigFromPath(path.Join(confPath, ".config", "osuapi", "config.json"))
 	}
-	return nil, errors.New("no variable set")
+
+	return nil, errors.New("no config found")
+}
+
+func errorHas(err error, content string) bool {
+	return strings.Contains(err.Error(), content)
+}
+
+func nilAndError(content string) (*Configuration, error) {
+	return nil, errors.New(content)
+}
+
+func getConfigFromEnv() (*Configuration, error) {
+	var cfg = new(Configuration)
+	if cfg.Key = os.Getenv("OSU_API_KEY"); cfg.Key == "" {
+		return nilAndError("no key is given")
+	}
+	if cfg.DBType = os.Getenv("OSU_DB_TYPE"); cfg.DBType == "" {
+		return nilAndError("no database type is given")
+	}
+
+	var dbs = DatabaseSettings{
+		Username: os.Getenv("OSU_DB_USERNAME"),
+		Password: os.Getenv("OSU_DB_PASSWORD"),
+	}
+	if dbs.Host = os.Getenv("OSU_DB_HOST"); dbs.Host == "" {
+		return nilAndError("no database host is given")
+	}
+
+	cfg.DatabaseSettings = dbs
+
+	return cfg, nil
 }
 
 func getConfigFromPath(path string) (*Configuration, error) {
