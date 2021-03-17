@@ -33,17 +33,17 @@ func (opd *OsuPlayerData) GetRecent(name, mapID string, perf bool) (*api.RecentP
 		scores, err := api.GetUserRecent(name, 1)
 
 		if err != nil {
-			return nil, fmt.Errorf("GetPlayerRecent: %v", err)
+			return nil, FmtErr(1, "GetPlayerRecent: %v", err)
 		}
 
 		if len(scores) < 1 {
-			return nil, errors.New("user not found")
+			return nil, MakeErr(0, "user not found")
 		}
 		return scores[0], nil
 	}
 	scores, err := api.GetUserRecent(name, 50)
 	if err != nil {
-		return nil, fmt.Errorf("GetPlayerRecent: %v", err)
+		return nil, FmtErr(1, "GetPlayerRecent: %v", err)
 	}
 
 	switch {
@@ -66,7 +66,7 @@ func (opd *OsuPlayerData) GetRecent(name, mapID string, perf bool) (*api.RecentP
 			}
 		}
 	}
-	return nil, fmt.Errorf("target not found")
+	return nil, MakeErr(0, "target not found")
 }
 
 func (*OsuPlayerData) GetBeatMaps(setID, mapID string) (*api.Beatmap, error) {
