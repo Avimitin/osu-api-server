@@ -1,3 +1,5 @@
 .git
 bin
 .idea
+docker-compose.yml
+data
