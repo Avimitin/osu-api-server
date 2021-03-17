@@ -1,9 +1,18 @@
 package api
 
-import "testing"
+import (
+	"fmt"
+	"os"
+	"testing"
+)
 
 func TestMain(t *testing.M) {
-	KeyInit()
+	err := KeyInit(os.Getenv("api_key"))
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	os.Exit(t.Run())
 }
 
 func TestGetBeatMaps(t *testing.T) {

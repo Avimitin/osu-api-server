@@ -154,6 +154,7 @@ func TestGetBeatMaps(t *testing.T) {
 		"/api/v1/beatmap",
 		strings.NewReader(form.Encode()),
 	)
+	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	ser := newSer()
 	ser.ServeHTTP(response, request)
 	assertStatus(t, response.Code, http.StatusOK)

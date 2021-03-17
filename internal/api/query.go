@@ -7,13 +7,12 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"os"
 	"strconv"
 	"strings"
 )
 
 const (
-	APIURL = "https://osu.ppy.sh/api/"
+	addr = "https://osu.ppy.sh/api/"
 )
 
 var (
@@ -22,11 +21,9 @@ var (
 
 // KeyInit designed to reusing init function
 func KeyInit(k string) error {
-	if key = os.Getenv("api_key"); key != "" {
-		return nil
-	}
 	if k != "" {
 		key = k
+		return nil
 	}
 	return errors.New("no api key found")
 }
@@ -107,7 +104,7 @@ func buildURL(method string, params map[string]string) string {
 	if method == "" || params == nil {
 		return ""
 	}
-	prefix := APIURL + method + "?"
+	prefix := addr + method + "?"
 	val := url.Values{}
 	for k, v := range params {
 		val.Set(k, v)
