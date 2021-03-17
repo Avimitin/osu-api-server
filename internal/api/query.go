@@ -23,6 +23,7 @@ var (
 func KeyInit(k string) error {
 	if k != "" {
 		key = k
+		return nil
 	}
 	return errors.New("no api key found")
 }
