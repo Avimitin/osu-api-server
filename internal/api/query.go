@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	APIURL = "https://osu.ppy.sh/api/"
+	addr = "https://osu.ppy.sh/api/"
 )
 
 var (
@@ -103,7 +103,7 @@ func buildURL(method string, params map[string]string) string {
 	if method == "" || params == nil {
 		return ""
 	}
-	prefix := APIURL + method + "?"
+	prefix := addr + method + "?"
 	val := url.Values{}
 	for k, v := range params {
 		val.Set(k, v)
