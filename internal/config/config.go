@@ -27,8 +27,9 @@ func GetConfig() (*Configuration, error) {
 
 		// if error is about file not found, get those fields from env
 		switch {
-		case errorHas(err, "no such file or directory"):
-		case errorHas(err, "The system cannot find the file specified"):
+		case errorHas(err, "no such file or directory"),
+			errorHas(err, "The system cannot find the file specified"):
+
 			cfg, err = getConfigFromEnv()
 			if err != nil {
 				return nil, err
