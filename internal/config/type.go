@@ -3,6 +3,7 @@ package config
 import "fmt"
 
 type Configuration struct {
+	Port             int              `json:"port"`
 	Key              string           `json:"key"`
 	DBType           string           `json:"db_type"`
 	DatabaseSettings DatabaseSettings `json:"database_settings"`

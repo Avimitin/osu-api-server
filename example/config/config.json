@@ -1,4 +1,5 @@
 {
+	"port": 11451,
 	"key": "hash",
 	"db_type": "redis",
 	"database_settings": {
