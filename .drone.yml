@@ -29,12 +29,19 @@ steps:
   - name: unit_test
     image: golang:1.15
     environment:
-      api_key:
-        from_secret: osu_api_key
       osuapi_project_root: "/go/src/osuapi"
     commands:
       - "go get ./..."
       - "go test -v -cover ./internal/..."
+
+  - name: intergration_test
+    image: golang:alpine
+    environment:
+      api_key:
+        from_secret: osu_api_key
+    commands:
+      - "go get ./..."
+      - "go test -v ./intergration/query_test.go"
 
   - name: mysql_test
     image: golang:1.15
