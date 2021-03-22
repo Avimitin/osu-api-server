@@ -8,12 +8,12 @@ import (
 
 // OsuServer is a http handler and it store player data
 type OsuServer struct {
-	Data OsuData
+	Data OsuDataGetter
 	http.Handler
 }
 
 // NewOsuServer return a OsuServer pointer
-func NewOsuServer(store OsuData) *OsuServer {
+func NewOsuServer(store OsuDataGetter) *OsuServer {
 	if store == nil {
 		panic("nil data store")
 	}
