@@ -1,13 +1,15 @@
-package api
+package intergration
 
 import (
 	"fmt"
 	"os"
 	"testing"
+
+	"github.com/avimitin/osu-api-server/internal/api"
 )
 
 func TestMain(t *testing.M) {
-	err := KeyInit(os.Getenv("api_key"))
+	err := api.KeyInit(os.Getenv("api_key"))
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -17,7 +19,7 @@ func TestMain(t *testing.M) {
 
 func TestGetBeatMaps(t *testing.T) {
 	t.Run("get beatmap set", func(t *testing.T) {
-		maps, err := GetBeatMaps("983911", "")
+		maps, err := api.GetBeatMaps("983911", "")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -31,7 +33,7 @@ func TestGetBeatMaps(t *testing.T) {
 	})
 
 	t.Run("get beatmap set", func(t *testing.T) {
-		maps, err := GetBeatMaps("", "2118444")
+		maps, err := api.GetBeatMaps("", "2118444")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -48,7 +50,7 @@ func TestGetBeatMaps(t *testing.T) {
 func TestGetUsers(t *testing.T) {
 	test := func(want string) {
 		t.Run("get user", func(t *testing.T) {
-			users, err := GetUsers(want)
+			users, err := api.GetUsers(want)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -71,7 +73,7 @@ func TestGetUserBest(t *testing.T) {
 	userid := "16900842"
 	mode := ""
 	limit := 10
-	maps, err := GetUserBest(userid, mode, limit)
+	maps, err := api.GetUserBest(userid, mode, limit)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -84,7 +86,7 @@ func TestGetUserBest(t *testing.T) {
 
 func TestGetUserRecent(t *testing.T) {
 	username := ""
-	recentMaps, err := GetUserRecent(username, 1)
+	recentMaps, err := api.GetUserRecent(username, 1)
 	if err != nil {
 		t.Fatal(err)
 	}
